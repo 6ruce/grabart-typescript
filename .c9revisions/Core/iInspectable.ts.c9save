@@ -1,0 +1,12 @@
+{"ts":1362173269944,"silentsave":true,"restoring":false,"patch":[[]],"length":0}
+{"contributors":[],"silentsave":false,"ts":1362173629281,"patch":[[{"diffs":[[1,"interface IInspectable {\n    getConstructorTypes():[]\n}"]],"start1":0,"start2":0,"length1":0,"length2":55}]],"length":55,"saved":false}
+{"ts":1362173837333,"patch":[[{"diffs":[[1,"module GrabArt.Core {\n    "],[0,"interfac"]],"start1":0,"start2":0,"length1":8,"length2":34},{"diffs":[[0,"e {\n    "],[1," "],[1,"   "],[0,"getConst"]],"start1":47,"start2":47,"length1":16,"length2":20},{"diffs":[[0,"es():[]\n"],[1,"    }\n"],[0,"}"]],"start1":76,"start2":76,"length1":9,"length2":15}]],"length":91,"saved":false}
+{"ts":1362173848577,"patch":[[{"diffs":[[0,"e {\n    "],[1,"export "],[0,"interfac"]],"start1":18,"start2":18,"length1":16,"length2":23}]],"length":98,"saved":false}
+{"ts":1362173901631,"patch":[[{"diffs":[[0,"es()"],[-1,":"],[1," : any"],[0,"[]"],[1,";"],[0,"\n   "]],"start1":83,"start2":83,"length1":11,"length2":17}]],"length":104,"saved":false}
+{"ts":1362176258450,"patch":[[{"diffs":[[0,") : "],[-1,"any"],[1,"IInspectable"],[0,"[];\n"]],"start1":86,"start2":86,"length1":11,"length2":20}]],"length":113,"saved":false}
+{"ts":1362176327875,"patch":[[{"diffs":[[0,"        "],[1,"static "],[0,"getConst"]],"start1":58,"start2":58,"length1":16,"length2":23}]],"length":120,"saved":false}
+{"ts":1362176469915,"patch":[[{"diffs":[[0,"    "],[-1,"static "],[0,"getC"]],"start1":62,"start2":62,"length1":15,"length2":8}]],"length":113,"saved":false}
+{"contributors":[],"silentsave":false,"ts":1362180516167,"patch":[[{"diffs":[[0,"able[];\n"],[1,"        new()                 : any;\n"],[0,"    }\n}"]],"start1":98,"start2":98,"length1":15,"length2":52}]],"length":150,"saved":false}
+{"ts":1362181909360,"patch":[[{"diffs":[[0," : any;\n"],[1,"        new(n : number)       : any;\n"],[0,"    }\n}"]],"start1":135,"start2":135,"length1":15,"length2":52}]],"length":187,"saved":false}
+{"ts":1362181917663,"patch":[[{"diffs":[[0,"ny;\n"],[-1,"        new(n : number)       : any;\n"],[0,"    "]],"start1":139,"start2":139,"length1":45,"length2":8}]],"length":150,"saved":false}
+{"ts":1362181994992,"patch":[[{"diffs":[[0," : any;\n"],[1,"        new(n : number)       : any;\n"],[0,"    }\n}"]],"start1":135,"start2":135,"length1":15,"length2":52}]],"length":187,"saved":false}
