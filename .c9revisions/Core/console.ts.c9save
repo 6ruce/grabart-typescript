@@ -1,0 +1,11 @@
+{"ts":1362386034129,"silentsave":true,"restoring":false,"patch":[[]],"length":0}
+{"contributors":[],"silentsave":false,"ts":1362386123591,"patch":[[{"diffs":[[1,"module GrabArt.Core {\n    export class Console {\n\n        writeLine(text : string) {\n            $('#consoleContent').prepend($('<div></div>').html(text));\n        }\n    }\n}"]],"start1":0,"start2":0,"length1":0,"length2":173}]],"length":173,"saved":false}
+{"ts":1362386219816,"patch":[[{"diffs":[[0,"        "],[1,"static "],[0,"writeLin"]],"start1":50,"start2":50,"length1":16,"length2":23}]],"length":180,"saved":false}
+{"ts":1362386526101,"patch":[[{"diffs":[[0,".Core {\n"],[1,"    declare var $;\n"],[0,"    expo"]],"start1":14,"start2":14,"length1":16,"length2":35}]],"length":199,"saved":false}
+{"ts":1362386580442,"patch":[[{"diffs":[[0,"').html("],[1,"'>' + "],[0,"text));\n"]],"start1":166,"start2":166,"length1":16,"length2":22}]],"length":205,"saved":false}
+{"ts":1362387139126,"patch":[[{"diffs":[[0,".html('>"],[1," "],[0,"' + text"]],"start1":168,"start2":168,"length1":16,"length2":17}]],"length":206,"saved":false}
+{"contributors":[],"silentsave":false,"ts":1362389245869,"patch":[[{"diffs":[[0,"       }"],[1,"\n\n        static writeLine(text : string, color : string) {\n            $('#consoleContent').prepend($('<div></div>').html('> ' + text));\n        }"],[0,"\n    }\n}"]],"start1":190,"start2":190,"length1":16,"length2":163}]],"length":353,"saved":false}
+{"ts":1362389266617,"patch":[[{"diffs":[[0,"tml('> ' + text)"],[1,".css('color', color)"],[0,");\n        }\n   "]],"start1":317,"start2":317,"length1":32,"length2":52}]],"length":373,"saved":false}
+{"ts":1362389342503,"patch":[[{"diffs":[[0,", color : string"],[1," = black"],[0,") {\n            "]],"start1":238,"start2":238,"length1":32,"length2":40}]],"length":381,"saved":false}
+{"ts":1362389347280,"patch":[[{"diffs":[[0," {\n\n"],[-1,"        static writeLine(text : string) {\n            $('#consoleContent').prepend($('<div></div>').html('> ' + text));\n        }\n\n"],[0,"    "]],"start1":65,"start2":65,"length1":139,"length2":8}]],"length":250,"saved":false}
+{"ts":1362389453779,"patch":[[{"diffs":[[0,"g = "],[1,"\""],[0,"black"],[1,"\""],[0,") {\n"]],"start1":122,"start2":122,"length1":13,"length2":15}]],"length":252,"saved":false}
