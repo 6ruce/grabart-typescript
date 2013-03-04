@@ -3,11 +3,10 @@ var GrabArt;
     var Application = (function () {
         function Application() { }
         Application.prototype.run = function () {
-            var container = this.configureDependencies(new GrabArt.DependencyContainer());
-            container.resolve(GrabArt.UI.WidgetContainer);
+            var container = this.configureWidgets(new GrabArt.UI.WidgetContainer());
         };
-        Application.prototype.configureDependencies = function (dc) {
-            return dc;
+        Application.prototype.configureWidgets = function (wc) {
+            return wc;
         };
         return Application;
     })();

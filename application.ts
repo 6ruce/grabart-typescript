@@ -1,17 +1,15 @@
-/// <reference path="dependencyContainer.ts" />
 /// <reference path="UI/widgetContainer.ts" />
 
 module GrabArt {
     export class Application {
 
         run () : void {
-            var container = this.configureDependencies(new DependencyContainer());
+            var container = this.configureWidgets(new UI.WidgetContainer());
 
-            container.resolve(UI.WidgetContainer);
         }
 
-        configureDependencies (dc : DependencyContainer ) : DependencyContainer {
-            return dc;
+        configureWidgets(wc : UI.WidgetContainer) : UI.WidgetContainer {
+            return wc;
         }
     }
 }

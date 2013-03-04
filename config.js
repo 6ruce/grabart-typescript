@@ -1,0 +1,5 @@
+var __configuration = {
+    "UI" : {
+
+    }
+};

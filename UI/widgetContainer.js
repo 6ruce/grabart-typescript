@@ -8,12 +8,10 @@ var GrabArt;
     (function (UI) {
         var WidgetContainer = (function (_super) {
             __extends(WidgetContainer, _super);
-            function WidgetContainer(n) {
-                        _super.call(this);
+            function WidgetContainer() {
+                _super.apply(this, arguments);
+
             }
-            WidgetContainer.getConstructorTypes = function getConstructorTypes() {
-                return [];
-            };
             return WidgetContainer;
         })(UI.Widget);
         UI.WidgetContainer = WidgetContainer;        
