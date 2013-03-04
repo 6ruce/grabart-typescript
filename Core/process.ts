@@ -1,10 +1,9 @@
 module GrabArt.Core {
-    interface IRunner {
+    export interface IRunner {
         () : void;
     }
 
     export class Process {
-
 
         private static runners : IRunner[] ;
 

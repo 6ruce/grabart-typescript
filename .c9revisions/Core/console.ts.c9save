@@ -9,3 +9,4 @@
 {"ts":1362389342503,"patch":[[{"diffs":[[0,", color : string"],[1," = black"],[0,") {\n            "]],"start1":238,"start2":238,"length1":32,"length2":40}]],"length":381,"saved":false}
 {"ts":1362389347280,"patch":[[{"diffs":[[0," {\n\n"],[-1,"        static writeLine(text : string) {\n            $('#consoleContent').prepend($('<div></div>').html('> ' + text));\n        }\n\n"],[0,"    "]],"start1":65,"start2":65,"length1":139,"length2":8}]],"length":250,"saved":false}
 {"ts":1362389453779,"patch":[[{"diffs":[[0,"g = "],[1,"\""],[0,"black"],[1,"\""],[0,") {\n"]],"start1":122,"start2":122,"length1":13,"length2":15}]],"length":252,"saved":false}
+{"contributors":[],"silentsave":false,"ts":1362399215059,"patch":[[{"diffs":[[0,"t')."],[1,"a"],[0,"p"],[-1,"re"],[0,"pend"]],"start1":166,"start2":166,"length1":11,"length2":10}]],"length":251,"saved":false}

@@ -2,12 +2,12 @@
 
 module GrabArt.Tests {
     export class TestCase {
-        private assertEqualsAny(expected : any, real: any) : bool {
-            return expected == real;
-        }
-
-        assertEquals(expected : string, real: string) : bool {
-            return this.assertEqualsAny(expected, real);
+        assertEquals(expected : any, real: any) : bool {
+            if (expected != real) {
+                Core.Console.writeLine("`" + real + "` not equals `" + expected + "` as expected", "red");
+                return false;
+            }
+            return true;
         }
     }
 }

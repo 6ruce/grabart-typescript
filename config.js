@@ -1,5 +1,0 @@
-var __configuration = {
-    "UI" : {
-
-    }
-};

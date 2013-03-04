@@ -3,7 +3,7 @@ module GrabArt.Core {
     export class Console {
 
         static writeLine(text : string, color : string = "black") {
-            $('#consoleContent').prepend($('<div></div>').html('> ' + text).css('color', color));
+            $('#consoleContent').append($('<div></div>').html('> ' + text).css('color', color));
         }
     }
 }
