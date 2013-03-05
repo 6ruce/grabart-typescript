@@ -1,4 +1,6 @@
 /// <reference path="testCase.ts" />
+/// <reference path="../Core/process.ts" />
+/// <reference path="../Core/console.ts" />
 
 module GrabArt.Tests {
     export class SampleTest extends TestCase {
@@ -7,11 +9,7 @@ module GrabArt.Tests {
         }
 
         testSomeFunctionality() {
-            this.assertEquals(1, 2);
-        }
-
-        testOtherFunction() {
-            this.assertEquals("a", "a");
+            Core.Process.create("test", 500, () => Core.Console.writeLine("from process", 'yellow'));
         }
     }
 }

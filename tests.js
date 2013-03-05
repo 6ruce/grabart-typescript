@@ -62,6 +62,28 @@ var GrabArt;
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
 })(GrabArt || (GrabArt = {}));
+var GrabArt;
+(function (GrabArt) {
+    (function (Core) {
+        var Process = (function () {
+            function Process() { }
+            Process.runners = {
+            };
+            Process.create = function create(name, interval, func) {
+                var id = setInterval(func, interval);
+                this.runners[name] = id;
+            };
+            Process.remove = function remove(name) {
+                if(undefined != typeof (this.runners[name])) {
+                    clearInterval(this.runners[name]);
+                }
+            };
+            return Process;
+        })();
+        Core.Process = Process;        
+    })(GrabArt.Core || (GrabArt.Core = {}));
+    var Core = GrabArt.Core;
+})(GrabArt || (GrabArt = {}));
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -80,10 +102,9 @@ var GrabArt;
                 return "Some test testing thought !";
             };
             SampleTest.prototype.testSomeFunctionality = function () {
-                this.assertEquals(1, 2);
-            };
-            SampleTest.prototype.testOtherFunction = function () {
-                this.assertEquals("a", "a");
+                GrabArt.Core.Process.create("test", function () {
+                    return GrabArt.Core.Console.writeLine("from process", 'yellow');
+                }, 500);
             };
             return SampleTest;
         })(Tests.TestCase);
