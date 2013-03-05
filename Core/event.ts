@@ -1,19 +1,23 @@
 /// <reference path="console.ts" />
 
 module GrabArt.Core {
-    export interface IHandler {
+    export interface IEventHandler {
         (sender : any, args : any) : void;
     }
 
     export class Event {
-        private handlers : IHandler[] = [];
+        private handlers : IEventHandler[] = [];
 
-        addListener(handler : IHandler) : Event {
+        addListener(handler : IEventHandler) : Event {
             this.handlers.push(handler);
             return this;
         }
+    }
 
-        fire(sender : any, args : any) : void {
+    export class EntireEvent extends Event {
+        private handlers : IEventHandler[] = [];
+
+        fire(sender : Object, args : any) : void {
             if (this.handlers.length != 0) {
                 for (var i in this.handlers) {
                     this.handlers[i](sender, args);

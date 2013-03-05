@@ -13,6 +13,11 @@ var GrabArt;
     })(GrabArt.Core || (GrabArt.Core = {}));
     var Core = GrabArt.Core;
 })(GrabArt || (GrabArt = {}));
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var GrabArt;
 (function (GrabArt) {
     (function (Core) {
@@ -24,16 +29,39 @@ var GrabArt;
                 this.handlers.push(handler);
                 return this;
             };
-            Event.prototype.fire = function (sender, args) {
+            return Event;
+        })();
+        Core.Event = Event;        
+        var EntireEvent = (function (_super) {
+            __extends(EntireEvent, _super);
+            function EntireEvent() {
+                _super.apply(this, arguments);
+
+                this.handlers = [];
+            }
+            EntireEvent.prototype.fire = function (sender, args) {
                 if(this.handlers.length != 0) {
                     for(var i in this.handlers) {
                         this.handlers[i](sender, args);
                     }
                 }
             };
-            return Event;
+            return EntireEvent;
+        })(Event);
+        Core.EntireEvent = EntireEvent;        
+        var EventUser = (function () {
+            function EventUser() {
+                this.somethingChanged = new EntireEvent();
+            }
+            EventUser.prototype.SomethingChanged = function () {
+                return this.somethingChanged;
+            };
+            EventUser.prototype.someMethod = function () {
+                this.somethingChanged.fire(this, "any");
+            };
+            return EventUser;
         })();
-        Core.Event = Event;        
+        Core.EventUser = EventUser;        
     })(GrabArt.Core || (GrabArt.Core = {}));
     var Core = GrabArt.Core;
 })(GrabArt || (GrabArt = {}));
@@ -84,11 +112,6 @@ var GrabArt;
     })(GrabArt.Core || (GrabArt.Core = {}));
     var Core = GrabArt.Core;
 })(GrabArt || (GrabArt = {}));
-var __extends = this.__extends || function (d, b) {
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -102,9 +125,12 @@ var GrabArt;
                 return "Some test testing thought !";
             };
             SampleTest.prototype.testSomeFunctionality = function () {
-                GrabArt.Core.Process.create("test", function () {
-                    return GrabArt.Core.Console.writeLine("from process", 'yellow');
-                }, 500);
+                var ts = new GrabArt.Core.EventUser();
+                ts.SomethingChanged().addListener(function (e, s) {
+                    return GrabArt.Core.Console.writeLine(s);
+                });
+                ts.someMethod();
+                ts.someMethod();
             };
             return SampleTest;
         })(Tests.TestCase);

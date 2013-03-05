@@ -1,6 +1,7 @@
 /// <reference path="testCase.ts" />
 /// <reference path="../Core/process.ts" />
 /// <reference path="../Core/console.ts" />
+/// <reference path="../Core/event.ts" />
 
 module GrabArt.Tests {
     export class SampleTest extends TestCase {
@@ -9,7 +10,10 @@ module GrabArt.Tests {
         }
 
         testSomeFunctionality() {
-            Core.Process.create("test", 500, () => Core.Console.writeLine("from process", 'yellow'));
+            var ts = new Core.EventUser();
+            ts.SomethingChanged().addListener((e,s) => Core.Console.writeLine(s));
+            ts.someMethod();
+            ts.someMethod();
         }
     }
 }
