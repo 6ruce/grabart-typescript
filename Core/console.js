@@ -5,7 +5,7 @@ var GrabArt;
             function Console() { }
             Console.writeLine = function writeLine(text, color) {
                 if (typeof color === "undefined") { color = "black"; }
-                $('#consoleContent').prepend($('<div></div>').html('> ' + text).css('color', color));
+                $('#consoleContent').append($('<div></div>').html('> ' + text).css('color', color));
             };
             return Console;
         })();

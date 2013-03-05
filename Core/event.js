@@ -4,10 +4,11 @@ var GrabArt;
         var Event = (function () {
             function Event() { }
             Event.prototype.addListener = function (handler) {
+                Core.Console.writeLine("add listener", 'green');
                 this.handlers.push(handler);
-                return this;
             };
             Event.prototype.fire = function (sender, args) {
+                Core.Console.writeLine("fire called", 'green');
                 if(this.handlers.length != 0) {
                     for(var i in this.handlers) {
                         this.handlers[i](sender, args);

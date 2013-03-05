@@ -4,11 +4,10 @@ var GrabArt;
         var TestCase = (function () {
             function TestCase() { }
             TestCase.prototype.assertEquals = function (expected, real) {
-                if(expected != real) {
-                    GrabArt.Core.Console.writeLine("`" + real + "` not equals `" + expected + "` as expected", "red");
-                    return false;
+                if(expected !== real) {
+                    var errorMessage = "`" + real + "`:" + typeof (real) + " not equals `" + expected + "`:" + typeof (expected) + " as expected";
+                    throw errorMessage;
                 }
-                return true;
             };
             return TestCase;
         })();
