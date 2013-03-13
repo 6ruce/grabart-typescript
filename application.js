@@ -4,6 +4,7 @@ var GrabArt;
         function Application() { }
         Application.prototype.run = function () {
             var container = this.configureWidgets(new GrabArt.UI.WidgetContainer());
+            var test = "test";
         };
         Application.prototype.configureWidgets = function (wc) {
             return wc;
@@ -12,3 +13,4 @@ var GrabArt;
     })();
     GrabArt.Application = Application;    
 })(GrabArt || (GrabArt = {}));
+//@ sourceMappingURL=application.js.map

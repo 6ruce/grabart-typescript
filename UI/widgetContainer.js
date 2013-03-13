@@ -18,3 +18,4 @@ var GrabArt;
     })(GrabArt.UI || (GrabArt.UI = {}));
     var UI = GrabArt.UI;
 })(GrabArt || (GrabArt = {}));
+//@ sourceMappingURL=widgetContainer.js.map

@@ -7,8 +7,8 @@ module GrabArt.UI {
         draw(drawer : any) : void {
             this.drawSelf(drawer);
 
-            for (var widgetName in widgets) {
-                widgets[widgetName].draw(drawer);
+            for (var widgetName in this.widgets) {
+                this.widgets[widgetName].draw(drawer);
             }
         }
 

@@ -5,6 +5,7 @@ module GrabArt {
 
         run () : void {
             var container = this.configureWidgets(new UI.WidgetContainer());
+            var test = "test";
 
         }
 
