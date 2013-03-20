@@ -25,5 +25,7 @@ var GrabArt;
         UI.Widget = Widget;        
     })(GrabArt.UI || (GrabArt.UI = {}));
     var UI = GrabArt.UI;
+
 })(GrabArt || (GrabArt = {}));
+
 //@ sourceMappingURL=widget.js.map
