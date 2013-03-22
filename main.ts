@@ -11,8 +11,4 @@
 declare var console;
 
 var application = new GrabArt.Application();
-try {
-    application.run();
-} catch (exc) {
-    console.log(exc);
-}
+try { application.run(); } catch (exc) { console.log(exc); }
