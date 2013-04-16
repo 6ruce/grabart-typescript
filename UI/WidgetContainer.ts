@@ -1,4 +1,4 @@
-/// <reference path="widget.ts" />
+///<reference path="Widget.ts" />
 
 module GrabArt.UI {
     export class WidgetContainer extends Widget {

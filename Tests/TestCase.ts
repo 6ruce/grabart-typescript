@@ -9,9 +9,5 @@ module GrabArt.Tests {
                 throw errorMessage;
             }
         }
-
-        reservedMethods() : string[] {
-            return ['constructor', 'assertEquals', 'reservedMethods', 'getDescription'];
-        }
     }
 }

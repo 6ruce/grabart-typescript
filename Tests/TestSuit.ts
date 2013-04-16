@@ -1,12 +1,11 @@
 /// <reference path="../Core/console.ts" />
-/// <reference path="../Core/event.ts" />
+/// <reference path="../Core/Event.ts" />
 
-/// <reference path="testCase.ts" />
-/// <reference path="sampleTest.ts" />
+/// <reference path="TestCase.ts" />
+/// <reference path="SampleTest.ts" />
 
 module GrabArt.Tests {
     export interface ITestCase {
-        reservedMethods : () => string[];
         getDescription  : () => string;
     }
 
@@ -18,11 +17,10 @@ module GrabArt.Tests {
             Core.Console.writeLine("[Start tests ...]", "green");
 
             for (var tests in testCases) {
-                var reservedMethods = testCases[tests].reservedMethods();
                 Core.Console.writeLine(testCases[tests].getDescription(), "brown");
                 for (var test in testCases[tests]) {
                     try {
-                        if (reservedMethods.indexOf(test) == -1) {
+                        if (test.search("test") != -1) {
                             testCases[tests][test]();
                             Core.Console.writeLine(test + ' - OK', "green");
                         }

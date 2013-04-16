@@ -1,4 +1,4 @@
-/// <reference path="UI/widgetContainer.ts" />
+/// <reference path="UI/WidgetContainer.ts" />
 
 module GrabArt {
     export class Application {

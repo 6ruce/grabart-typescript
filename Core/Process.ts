@@ -12,12 +12,12 @@ module GrabArt.Core {
 
         static create(name : string, interval : number, func : IRunner) : void {
             var id = setInterval(func, interval);
-            this.runners[name] = id;
+            Process.runners[name] = id;
         }
 
         static remove(name : string) : void {
-            if (undefined != typeof(this.runners[name])) {
-                clearInterval(this.runners[name]);
+            if (undefined != typeof(Process.runners[name])) {
+                clearInterval(Process.runners[name]);
             }
         }
     }
