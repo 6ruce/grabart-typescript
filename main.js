@@ -4,3 +4,4 @@ try  {
 } catch (exc) {
     console.log(exc);
 }
+//@ sourceMappingURL=main.js.map

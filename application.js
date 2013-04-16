@@ -12,3 +12,4 @@ var GrabArt;
     })();
     GrabArt.Application = Application;    
 })(GrabArt || (GrabArt = {}));
+//@ sourceMappingURL=application.js.map
