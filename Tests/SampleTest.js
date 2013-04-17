@@ -13,9 +13,10 @@ var GrabArt;
 
             }
             SampleTest.prototype.getDescription = function () {
-                return "Some test testing thought !";
+                return 'Recover after git push conflicts';
             };
-            SampleTest.prototype.testSomeFunctionality = function () {
+            SampleTest.prototype.testMustSucced = function () {
+                this.assertEquals(1, 1);
             };
             return SampleTest;
         })(Tests.TestCase);
