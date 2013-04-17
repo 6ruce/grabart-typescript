@@ -64,6 +64,86 @@ var GrabArt;
 
 var GrabArt;
 (function (GrabArt) {
+    (function (UI) {
+        var Widget = (function () {
+            function Widget(name) {
+                this.name = name;
+                this.position = {
+                    x: 0,
+                    y: 0,
+                    relative: "static"
+                };
+                this.sizes = {
+                    w: 100,
+                    h: 75
+                };
+                this.unit = 'px';
+                this.visible = true;
+                this.domId = null;
+                this.domElement = null;
+                this.init();
+            }
+            Widget.prototype.draw = function () {
+                var domElem = this.drawSelf();
+                for(var widgetName in this.widgets) {
+                    $(domElem).append(this.widgets[widgetName].draw());
+                }
+                return domElem;
+            };
+            Widget.prototype.drawSelf = function () {
+                if(this.domId === null) {
+                    this.domId = '' + this.getName() + new Date().getTime().toString();
+                    this.domElement = $('<div></div>');
+                    var $element = $(this.domElement).id(this.domId);
+                    $element.css({
+                        left: this.position.x + this.unit
+                    }).css({
+                        top: this.position.y + this.unit
+                    }).css({
+                        width: this.sizes.w + this.unit
+                    }).css({
+                        height: this.sizes.h + this.unit
+                    });
+                    $element.css('position', this.position.relative || 'static');
+                }
+                return this.domElement;
+            };
+            Widget.prototype.addWidget = function (widget) {
+                this.widgets[widget.getName()] = widget;
+                return this;
+            };
+            Widget.prototype.getName = function () {
+                return this.name;
+            };
+            Widget.prototype.setPosition = function (pos) {
+                if(pos === null) {
+                    throw "pos is null";
+                }
+                this.position = pos;
+                return this;
+            };
+            Widget.prototype.getPosition = function () {
+                return this.position;
+            };
+            Widget.prototype.setSizes = function (sizes) {
+                if(sizes === null) {
+                    throw "pos is null";
+                }
+                this.sizes = sizes;
+                return this;
+            };
+            Widget.prototype.init = function () {
+            };
+            return Widget;
+        })();
+        UI.Widget = Widget;        
+    })(GrabArt.UI || (GrabArt.UI = {}));
+    var UI = GrabArt.UI;
+
+})(GrabArt || (GrabArt = {}));
+
+var GrabArt;
+(function (GrabArt) {
     (function (Tests) {
         (function (UI) {
             var WidgetTest = (function (_super) {
@@ -74,6 +154,15 @@ var GrabArt;
                 }
                 WidgetTest.prototype.getDescription = function () {
                     return 'UI.Widget tests';
+                };
+                WidgetTest.prototype.testNewWidgetCreationWithoutParams = function () {
+                    var testWidget = new GrabArt.UI.Widget('test');
+                    var domElem = testWidget.drawSelf();
+                    this.assertEquals('static', domElem.style.position);
+                    this.assertEquals(0, domElem.style.left);
+                    this.assertEquals(0, domElem.style.top);
+                    this.assertEquals(100, domElem.style.width);
+                    this.assertEquals(75, domElem.style.height);
                 };
                 return WidgetTest;
             })(GrabArt.Tests.TestCase);
