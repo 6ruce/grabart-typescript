@@ -1,3 +1,5 @@
+/// <reference path="jquery.d.ts" />
+
 module GrabArt.UI {
     declare var $;
     export interface IPosition {
@@ -26,7 +28,7 @@ module GrabArt.UI {
         }
 
         draw() : any {
-            var domElem = this.drawSelf(parent);
+            var domElem = this.drawSelf();
 
             for (var widgetName in this.widgets) {
                 $(domElem).append(this.widgets[widgetName].draw());
@@ -35,7 +37,7 @@ module GrabArt.UI {
             return domElem;
         }
 
-        drawSelf(parent : Widget) : any {
+        drawSelf() : any {
             if (this.domId === null) {
                 this.domId      = '' + this.getName() + new Date().getTime().toString();
                 this.domElement = $('<div></div>');
@@ -43,9 +45,9 @@ module GrabArt.UI {
                 $element.css({ left : this.position.x + this.unit })
                         .css({ top  : this.position.y + this.unit });
 
-                $element.style(
+                $element.css(
                       'position'
-                    , 
+                    , this.position.relative || 'static'
                 );
 
             }
@@ -82,10 +84,9 @@ module GrabArt.UI {
             }
 
             this.sizes = sizes;
-        }
 
-        /* abstract */
-        drawSelf(drawer : any) : void {}
+            return this;
+        }
 
         /* abstract */
         init() : void {}

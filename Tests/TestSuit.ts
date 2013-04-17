@@ -1,8 +1,8 @@
 /// <reference path="../Core/Console.ts" />
-/// <reference path="../Core/Event.ts" />
 
 /// <reference path="TestCase.ts" />
 /// <reference path="SampleTest.ts" />
+/// <reference path="UI/WidgetTest.ts" />
 
 module GrabArt.Tests {
     export interface ITestCase {
@@ -33,7 +33,7 @@ module GrabArt.Tests {
 
         private configure() : ITestCase[] {
             return [
-                new SampleTest()
+                new UI.WidgetTest()
             ];
         }
     }

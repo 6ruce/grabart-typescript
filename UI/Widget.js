@@ -1,4 +1,3 @@
-<<<<<<< HEAD:UI/widget.js
 var GrabArt;
 (function (GrabArt) {
     (function (UI) {
@@ -14,25 +13,32 @@ var GrabArt;
                     w: 100,
                     h: 75
                 };
+                this.unit = 'px';
                 this.visible = true;
                 this.domId = null;
                 this.domElement = null;
                 this.init();
             }
             Widget.prototype.draw = function () {
-                var domElem = this.drawSelf(parent);
+                var domElem = this.drawSelf();
                 for(var widgetName in this.widgets) {
                     $(domElem).append(this.widgets[widgetName].draw());
                 }
                 return domElem;
             };
-            Widget.prototype.drawSelf = function (parent) {
+            Widget.prototype.drawSelf = function () {
                 if(this.domId === null) {
                     this.domId = '' + this.getName() + new Date().getTime().toString();
                     this.domElement = $('<div></div>');
                     var $element = $(this.domElement).id(this.domId);
-                    $element.style('position');
+                    $element.css({
+                        left: this.position.x + this.unit
+                    }).css({
+                        top: this.position.y + this.unit
+                    });
+                    $element.css('position', this.position.relative || 'static');
                 }
+                return this.domElement;
             };
             Widget.prototype.addWidget = function (widget) {
                 this.widgets[widget.getName()] = widget;
@@ -56,8 +62,7 @@ var GrabArt;
                     throw "pos is null";
                 }
                 this.sizes = sizes;
-            };
-            Widget.prototype.drawSelf = function (drawer) {
+                return this;
             };
             Widget.prototype.init = function () {
             };
@@ -66,38 +71,7 @@ var GrabArt;
         UI.Widget = Widget;        
     })(GrabArt.UI || (GrabArt.UI = {}));
     var UI = GrabArt.UI;
-})(GrabArt || (GrabArt = {}));
-//@ sourceMappingURL=Widget.js.map
-=======
-var GrabArt;
-(function (GrabArt) {
-    (function (UI) {
-        var Widget = (function () {
-            function Widget(name) {
-                this.name = name;
-            }
-            Widget.prototype.draw = function (drawer) {
-                this.drawSelf(drawer);
-                for(var widgetName in this.widgets) {
-                    this.widgets[widgetName].draw(drawer);
-                }
-            };
-            Widget.prototype.addWidget = function (widget) {
-                this.widgets[widget.getName()] = widget;
-                return this;
-            };
-            Widget.prototype.drawSelf = function (drawer) {
-            };
-            Widget.prototype.getName = function () {
-                return this.name;
-            };
-            return Widget;
-        })();
-        UI.Widget = Widget;        
-    })(GrabArt.UI || (GrabArt.UI = {}));
-    var UI = GrabArt.UI;
 
 })(GrabArt || (GrabArt = {}));
 
 //@ sourceMappingURL=Widget.js.map
->>>>>>> origin/master:UI/Widget.js
