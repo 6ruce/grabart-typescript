@@ -30,7 +30,7 @@ var GrabArt;
                 if(this.domId === null) {
                     this.domId = '' + this.getName() + new Date().getTime().toString();
                     this.domElement = $('<div></div>');
-                    var $element = $(this.domElement).id(this.domId);
+                    var $element = $(this.domElement).attr('id', this.domId);
                     $element.css({
                         left: this.position.x + this.unit
                     }).css({
