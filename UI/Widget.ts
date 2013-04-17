@@ -42,8 +42,10 @@ module GrabArt.UI {
                 this.domId      = '' + this.getName() + new Date().getTime().toString();
                 this.domElement = $('<div></div>');
                 var $element    = $(this.domElement).id(this.domId);
-                $element.css({ left : this.position.x + this.unit })
-                        .css({ top  : this.position.y + this.unit });
+                $element.css({ left   : this.position.x + this.unit })
+                        .css({ top    : this.position.y + this.unit })
+                        .css({ width  : this.sizes.w    + this.unit })
+                        .css({ height : this.sizes.h    + this.unit });
 
                 $element.css(
                       'position'

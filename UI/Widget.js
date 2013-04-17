@@ -35,6 +35,10 @@ var GrabArt;
                         left: this.position.x + this.unit
                     }).css({
                         top: this.position.y + this.unit
+                    }).css({
+                        width: this.sizes.w + this.unit
+                    }).css({
+                        height: this.sizes.h + this.unit
                     });
                     $element.css('position', this.position.relative || 'static');
                 }
