@@ -1,4 +1,4 @@
-/// <reference path="UI/WidgetContainer.ts" />
+/// <reference path="GApp/UI/MainWidget.ts" />
 /// <reference path="jquery.d.ts" />
 
 module GrabArt {
@@ -6,7 +6,13 @@ module GrabArt {
         constructor(private page){}
 
         run () : void {
-            $(this.page).append(new GrabArt.UI.Widget('main').draw());
+            var mainWindow = new GrabArt.GApp.UI.MainWidget('main');
+            mainWindow.addWidget(
+                new GrabArt.UI.Widget('test')
+                    .setBackgroundColor('red')
+            );
+
+            $(this.page).append(mainWindow.draw());
         }
     }
 }

@@ -1,5 +1,3 @@
-/// <reference path="console.ts" />
-
 module GrabArt.Core {
     export interface IEventHandler {
         (sender : any, args : any) : void;

@@ -1,7 +1,7 @@
-/// <reference path="jquery.d.ts" />
+/// <reference path="../jquery.d.ts" />
+/// <reference path="../Core/Event.ts">
 
 module GrabArt.UI {
-    declare var $;
     export interface IPosition {
         x         : number;
         y         : number;
@@ -22,7 +22,9 @@ module GrabArt.UI {
         private domElement : any       = null;
         private bgColor    : string    = 'grey';
 
-        private widgets    : { [name : string] : Widget; };
+        private widgets    : { [name : string] : Widget; } = {};
+
+        private mouseOverEv : GrabArt.Core.Event;
 
         constructor (private name : string) {
             this.init();
@@ -42,19 +44,18 @@ module GrabArt.UI {
             if (this.domId === null) {
                 this.domId      = '' + this.getName() + new Date().getTime().toString();
                 this.domElement = $('<div></div>');
-
-                this.domElement
-                    .attr('id', this.domId)
-                    .css({
-                          left            : this.position.x + this.unit
-                        , top             : this.position.y + this.unit
-                        , width           : this.sizes.w    + this.unit
-                        , height          : this.sizes.h    + this.unit
-                        , backgroundColor : this.bgColor
-                        , position        : this.position.relative || 'static'
-                    });
-
             }
+
+            this.domElement
+                .attr('id', this.domId)
+                .css({
+                      left            : this.position.x + this.unit
+                    , top             : this.position.y + this.unit
+                    , width           : this.sizes.w    + this.unit
+                    , height          : this.sizes.h    + this.unit
+                    , backgroundColor : this.bgColor
+                    , position        : this.position.relative || 'static'
+                });
 
             return this.domElement;
         }
@@ -82,7 +83,7 @@ module GrabArt.UI {
 
         setSizes(sizes : ISizes) : Widget {
             if (sizes === null) {
-                throw "pos is null";
+                throw "sizes is null";
             }
 
             this.sizes = sizes;
@@ -90,8 +91,22 @@ module GrabArt.UI {
             return this;
         }
 
+        getSizes() : ISizes {
+            return this.sizes;
+        }
+
         getUnit() : string {
             return this.unit;
+        }
+
+        setBackgroundColor(color : string) : Widget {
+            if (color === null) {
+                throw "color is null";
+            }
+
+            this.bgColor = color;
+
+            return this;
         }
 
         /* abstract */

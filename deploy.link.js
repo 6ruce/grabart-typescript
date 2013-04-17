@@ -18,6 +18,8 @@ var GrabArt;
                 this.domId = null;
                 this.domElement = null;
                 this.bgColor = 'grey';
+                this.widgets = {
+                };
                 this.init();
             }
             Widget.prototype.draw = function () {
@@ -49,11 +51,11 @@ var GrabArt;
             Widget.prototype.getName = function () {
                 return this.name;
             };
-            Widget.prototype.setPosition = function (pos) {
-                if(pos === null) {
-                    throw "pos is null";
+            Widget.prototype.setPosition = function (position) {
+                if(position === null) {
+                    throw "position is null";
                 }
-                this.position = pos;
+                this.position = position;
                 return this;
             };
             Widget.prototype.getPosition = function () {
@@ -61,13 +63,23 @@ var GrabArt;
             };
             Widget.prototype.setSizes = function (sizes) {
                 if(sizes === null) {
-                    throw "pos is null";
+                    throw "sizes is null";
                 }
                 this.sizes = sizes;
                 return this;
             };
+            Widget.prototype.getSizes = function () {
+                return this.sizes;
+            };
             Widget.prototype.getUnit = function () {
                 return this.unit;
+            };
+            Widget.prototype.setBackgroundColor = function (color) {
+                if(color === null) {
+                    throw "color is null";
+                }
+                this.bgColor = color;
+                return this;
             };
             Widget.prototype.init = function () {
             };
@@ -86,18 +98,32 @@ var __extends = this.__extends || function (d, b) {
 }
 var GrabArt;
 (function (GrabArt) {
-    (function (UI) {
-        var WidgetContainer = (function (_super) {
-            __extends(WidgetContainer, _super);
-            function WidgetContainer() {
-                _super.apply(this, arguments);
+    (function (GApp) {
+        (function (UI) {
+            var MainWidget = (function (_super) {
+                __extends(MainWidget, _super);
+                function MainWidget() {
+                    _super.apply(this, arguments);
 
-            }
-            return WidgetContainer;
-        })(UI.Widget);
-        UI.WidgetContainer = WidgetContainer;        
-    })(GrabArt.UI || (GrabArt.UI = {}));
-    var UI = GrabArt.UI;
+                }
+                MainWidget.prototype.init = function () {
+                    this.setPosition({
+                        x: 600,
+                        y: 100,
+                        relative: 'fixed'
+                    }).setSizes({
+                        w: 200,
+                        h: 100
+                    });
+                };
+                return MainWidget;
+            })(GrabArt.UI.Widget);
+            UI.MainWidget = MainWidget;            
+        })(GApp.UI || (GApp.UI = {}));
+        var UI = GApp.UI;
+
+    })(GrabArt.GApp || (GrabArt.GApp = {}));
+    var GApp = GrabArt.GApp;
 
 })(GrabArt || (GrabArt = {}));
 
@@ -108,7 +134,9 @@ var GrabArt;
             this.page = page;
         }
         Application.prototype.run = function () {
-            $(this.page).append(new GrabArt.UI.Widget('main').draw());
+            var mainWindow = new GrabArt.GApp.UI.MainWidget('main');
+            mainWindow.addWidget(new GrabArt.UI.Widget('test').setBackgroundColor('red'));
+            $(this.page).append(mainWindow.draw());
         };
         return Application;
     })();
@@ -192,12 +220,32 @@ var GrabArt;
                     var domElem = testWidget.drawSelf()[0];
                     var unit = testWidget.getUnit();
 
-                    console.log(domElem);
                     this.assertEquals('static', domElem.style.position);
                     this.assertEquals(0 + unit, domElem.style.left);
                     this.assertEquals(0 + unit, domElem.style.top);
                     this.assertEquals(100 + unit, domElem.style.width);
                     this.assertEquals(75 + unit, domElem.style.height);
+                };
+                WidgetTest.prototype.testNewWidgetCreationWithCustomSizes = function () {
+                    var testWidget = new GrabArt.UI.Widget('test').setSizes({
+                        w: 200,
+                        h: 200
+                    });
+                    var domElem = testWidget.drawSelf()[0];
+                    var unit = testWidget.getUnit();
+
+                    this.assertEquals(200 + unit, domElem.style.width);
+                    this.assertEquals(200 + unit, domElem.style.height);
+                };
+                WidgetTest.prototype.testSizesSetup = function () {
+                    var testWidget = new GrabArt.UI.Widget('test').setSizes({
+                        w: 200,
+                        h: 200
+                    });
+                    var unit = testWidget.getUnit();
+
+                    this.assertEquals(200, testWidget.getSizes().w);
+                    this.assertEquals(200, testWidget.getSizes().h);
                 };
                 return WidgetTest;
             })(GrabArt.Tests.TestCase);
