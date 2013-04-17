@@ -1,3 +1,20 @@
+var GrabArt;
+(function (GrabArt) {
+    (function (Core) {
+        var Console = (function () {
+            function Console() { }
+            Console.writeLine = function writeLine(text, color) {
+                if (typeof color === "undefined") { color = "black"; }
+                $('#consoleContent').append($('<div></div>').html('> ' + text).css('color', color));
+            }
+            return Console;
+        })();
+        Core.Console = Console;        
+    })(GrabArt.Core || (GrabArt.Core = {}));
+    var Core = GrabArt.Core;
+
+})(GrabArt || (GrabArt = {}));
+
 var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
@@ -60,47 +77,6 @@ var GrabArt;
 
 var GrabArt;
 (function (GrabArt) {
-    (function (Core) {
-        var Process = (function () {
-            function Process() { }
-            Process.runners = {
-            };
-            Process.create = function create(name, interval, func) {
-                var id = setInterval(func, interval);
-                Process.runners[name] = id;
-            }
-            Process.remove = function remove(name) {
-                if(undefined != typeof (Process.runners[name])) {
-                    clearInterval(Process.runners[name]);
-                }
-            }
-            return Process;
-        })();
-        Core.Process = Process;        
-    })(GrabArt.Core || (GrabArt.Core = {}));
-    var Core = GrabArt.Core;
-
-})(GrabArt || (GrabArt = {}));
-
-var GrabArt;
-(function (GrabArt) {
-    (function (Core) {
-        var Console = (function () {
-            function Console() { }
-            Console.writeLine = function writeLine(text, color) {
-                if (typeof color === "undefined") { color = "black"; }
-                $('#consoleContent').append($('<div></div>').html('> ' + text).css('color', color));
-            }
-            return Console;
-        })();
-        Core.Console = Console;        
-    })(GrabArt.Core || (GrabArt.Core = {}));
-    var Core = GrabArt.Core;
-
-})(GrabArt || (GrabArt = {}));
-
-var GrabArt;
-(function (GrabArt) {
     (function (Tests) {
         var SampleTest = (function (_super) {
             __extends(SampleTest, _super);
@@ -109,9 +85,10 @@ var GrabArt;
 
             }
             SampleTest.prototype.getDescription = function () {
-                return "Some test testing thought !";
+                return 'Recover after git push conflicts';
             };
-            SampleTest.prototype.testSomeFunctionality = function () {
+            SampleTest.prototype.testMustSucced = function () {
+                this.assertEquals(1, 1);
             };
             return SampleTest;
         })(Tests.TestCase);

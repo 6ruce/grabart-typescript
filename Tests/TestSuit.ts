@@ -1,4 +1,4 @@
-/// <reference path="../Core/console.ts" />
+/// <reference path="../Core/Console.ts" />
 /// <reference path="../Core/Event.ts" />
 
 /// <reference path="TestCase.ts" />
