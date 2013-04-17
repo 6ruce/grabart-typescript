@@ -66,12 +66,12 @@ module GrabArt.UI {
 
         getName() { return this.name; }
 
-        setPosition(pos : IPosition) : Widget {
-            if (pos === null) {
-                throw "pos is null";
+        setPosition(position : IPosition) : Widget {
+            if (position === null) {
+                throw "position is null";
             }
 
-            this.position = pos;
+            this.position = position;
 
             return this;
         }
