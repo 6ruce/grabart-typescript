@@ -15,47 +15,6 @@ var GrabArt;
 
 })(GrabArt || (GrabArt = {}));
 
-var __extends = this.__extends || function (d, b) {
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-}
-var GrabArt;
-(function (GrabArt) {
-    (function (Core) {
-        var Event = (function () {
-            function Event() {
-                this.handlers = [];
-            }
-            Event.prototype.addListener = function (handler) {
-                this.handlers.push(handler);
-                return this;
-            };
-            return Event;
-        })();
-        Core.Event = Event;        
-        var EntireEvent = (function (_super) {
-            __extends(EntireEvent, _super);
-            function EntireEvent() {
-                _super.apply(this, arguments);
-
-                this.handlers = [];
-            }
-            EntireEvent.prototype.fire = function (sender, args) {
-                if(this.handlers.length != 0) {
-                    for(var i in this.handlers) {
-                        this.handlers[i](sender, args);
-                    }
-                }
-            };
-            return EntireEvent;
-        })(Event);
-        Core.EntireEvent = EntireEvent;        
-    })(GrabArt.Core || (GrabArt.Core = {}));
-    var Core = GrabArt.Core;
-
-})(GrabArt || (GrabArt = {}));
-
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -75,6 +34,11 @@ var GrabArt;
 
 })(GrabArt || (GrabArt = {}));
 
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+}
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -93,6 +57,30 @@ var GrabArt;
             return SampleTest;
         })(Tests.TestCase);
         Tests.SampleTest = SampleTest;        
+    })(GrabArt.Tests || (GrabArt.Tests = {}));
+    var Tests = GrabArt.Tests;
+
+})(GrabArt || (GrabArt = {}));
+
+var GrabArt;
+(function (GrabArt) {
+    (function (Tests) {
+        (function (UI) {
+            var WidgetTest = (function (_super) {
+                __extends(WidgetTest, _super);
+                function WidgetTest() {
+                    _super.apply(this, arguments);
+
+                }
+                WidgetTest.prototype.getDescription = function () {
+                    return 'UI.Widget tests';
+                };
+                return WidgetTest;
+            })(GrabArt.Tests.TestCase);
+            UI.WidgetTest = WidgetTest;            
+        })(Tests.UI || (Tests.UI = {}));
+        var UI = Tests.UI;
+
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
 
@@ -122,7 +110,7 @@ var GrabArt;
             };
             TestSuit.prototype.configure = function () {
                 return [
-                    new Tests.SampleTest()
+                    new Tests.UI.WidgetTest()
                 ];
             };
             return TestSuit;
