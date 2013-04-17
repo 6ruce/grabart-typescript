@@ -3,6 +3,7 @@
 /// <reference path="TestCase.ts" />
 /// <reference path="SampleTest.ts" />
 /// <reference path="UI/WidgetTest.ts" />
+/// <reference path="Core/EventsTest.ts" />
 
 module GrabArt.Tests {
     export interface ITestCase {
@@ -14,18 +15,18 @@ module GrabArt.Tests {
         run() : void {
             var testCases : ITestCase[] = this.configure();
 
-            Core.Console.writeLine("[Start tests ...]", "green");
+            GrabArt.Core.Console.writeLine("[Start tests ...]", "green");
 
             for (var tests in testCases) {
-                Core.Console.writeLine(testCases[tests].getDescription(), "brown");
+                GrabArt.Core.Console.writeLine(testCases[tests].getDescription(), "brown");
                 for (var test in testCases[tests]) {
                     try {
                         if (test.search("test") != -1) {
                             testCases[tests][test]();
-                            Core.Console.writeLine(test + ' - OK', "green");
+                            GrabArt.Core.Console.writeLine(test + ' - OK', "green");
                         }
                     } catch (ex)  {
-                        Core.Console.writeLine(test + ' - ' + ex, "red");
+                        GrabArt.Core.Console.writeLine(test + ' - ' + ex, "red");
                     }
                 }
             }
@@ -33,7 +34,8 @@ module GrabArt.Tests {
 
         private configure() : ITestCase[] {
             return [
-                new UI.WidgetTest()
+                new UI.WidgetTest(),
+                new Core.EventsTest()
             ];
         }
     }

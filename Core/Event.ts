@@ -1,6 +1,6 @@
 module GrabArt.Core {
     export interface IEventHandler {
-        (sender : any, args : any) : void;
+        (sender : Object, args : any) : void;
     }
 
     export class Event {

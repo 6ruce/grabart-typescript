@@ -1,7 +1,8 @@
-/// <reference path="GApp/UI/MainWidget.ts" />
-/// <reference path="jquery.d.ts" />
+/// <reference  path="GApp/UI/MainWidget.ts" />
+/// <reference_ path="jquery.d.ts"           />
 
 module GrabArt {
+    declare var $;
     export class Application {
         constructor(private page){}
 
@@ -11,6 +12,8 @@ module GrabArt {
                 new GrabArt.UI.Widget('test')
                     .setBackgroundColor('red')
             );
+
+            mainWindow.MouseMove.addListener((sender, args) => { console.log(args);});
 
             $(this.page).append(mainWindow.draw());
         }
