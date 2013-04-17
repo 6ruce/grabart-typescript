@@ -17,6 +17,7 @@ var GrabArt;
                 this.visible = true;
                 this.domId = null;
                 this.domElement = null;
+                this.bgColor = 'grey';
                 this.init();
             }
             Widget.prototype.draw = function () {
@@ -30,17 +31,14 @@ var GrabArt;
                 if(this.domId === null) {
                     this.domId = '' + this.getName() + new Date().getTime().toString();
                     this.domElement = $('<div></div>');
-                    var $element = $(this.domElement).attr('id', this.domId);
-                    $element.css({
-                        left: this.position.x + this.unit
-                    }).css({
-                        top: this.position.y + this.unit
-                    }).css({
-                        width: this.sizes.w + this.unit
-                    }).css({
-                        height: this.sizes.h + this.unit
+                    this.domElement.attr('id', this.domId).css({
+                        left: this.position.x + this.unit,
+                        top: this.position.y + this.unit,
+                        width: this.sizes.w + this.unit,
+                        height: this.sizes.h + this.unit,
+                        backgroundColor: this.bgColor,
+                        position: this.position.relative || 'static'
                     });
-                    $element.css('position', this.position.relative || 'static');
                 }
                 return this.domElement;
             };
@@ -67,6 +65,9 @@ var GrabArt;
                 }
                 this.sizes = sizes;
                 return this;
+            };
+            Widget.prototype.getUnit = function () {
+                return this.unit;
             };
             Widget.prototype.init = function () {
             };

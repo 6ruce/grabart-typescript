@@ -1,15 +1,12 @@
 /// <reference path="UI/WidgetContainer.ts" />
+/// <reference path="jquery.d.ts" />
 
 module GrabArt {
     export class Application {
+        constructor(private page){}
 
         run () : void {
-            var container = this.configureWidgets(new UI.WidgetContainer());
-
-        }
-
-        configureWidgets(wc : UI.WidgetContainer) : UI.WidgetContainer {
-            return wc;
+            $(this.page).append(new GrabArt.UI.Widget('main').draw());
         }
     }
 }

@@ -1,5 +1,122 @@
 var GrabArt;
 (function (GrabArt) {
+    (function (UI) {
+        var Widget = (function () {
+            function Widget(name) {
+                this.name = name;
+                this.position = {
+                    x: 0,
+                    y: 0,
+                    relative: "static"
+                };
+                this.sizes = {
+                    w: 100,
+                    h: 75
+                };
+                this.unit = 'px';
+                this.visible = true;
+                this.domId = null;
+                this.domElement = null;
+                this.bgColor = 'grey';
+                this.init();
+            }
+            Widget.prototype.draw = function () {
+                var domElem = this.drawSelf();
+                for(var widgetName in this.widgets) {
+                    $(domElem).append(this.widgets[widgetName].draw());
+                }
+                return domElem;
+            };
+            Widget.prototype.drawSelf = function () {
+                if(this.domId === null) {
+                    this.domId = '' + this.getName() + new Date().getTime().toString();
+                    this.domElement = $('<div></div>');
+                    this.domElement.attr('id', this.domId).css({
+                        left: this.position.x + this.unit,
+                        top: this.position.y + this.unit,
+                        width: this.sizes.w + this.unit,
+                        height: this.sizes.h + this.unit,
+                        backgroundColor: this.bgColor,
+                        position: this.position.relative || 'static'
+                    });
+                }
+                return this.domElement;
+            };
+            Widget.prototype.addWidget = function (widget) {
+                this.widgets[widget.getName()] = widget;
+                return this;
+            };
+            Widget.prototype.getName = function () {
+                return this.name;
+            };
+            Widget.prototype.setPosition = function (pos) {
+                if(pos === null) {
+                    throw "pos is null";
+                }
+                this.position = pos;
+                return this;
+            };
+            Widget.prototype.getPosition = function () {
+                return this.position;
+            };
+            Widget.prototype.setSizes = function (sizes) {
+                if(sizes === null) {
+                    throw "pos is null";
+                }
+                this.sizes = sizes;
+                return this;
+            };
+            Widget.prototype.getUnit = function () {
+                return this.unit;
+            };
+            Widget.prototype.init = function () {
+            };
+            return Widget;
+        })();
+        UI.Widget = Widget;        
+    })(GrabArt.UI || (GrabArt.UI = {}));
+    var UI = GrabArt.UI;
+
+})(GrabArt || (GrabArt = {}));
+
+var __extends = this.__extends || function (d, b) {
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+}
+var GrabArt;
+(function (GrabArt) {
+    (function (UI) {
+        var WidgetContainer = (function (_super) {
+            __extends(WidgetContainer, _super);
+            function WidgetContainer() {
+                _super.apply(this, arguments);
+
+            }
+            return WidgetContainer;
+        })(UI.Widget);
+        UI.WidgetContainer = WidgetContainer;        
+    })(GrabArt.UI || (GrabArt.UI = {}));
+    var UI = GrabArt.UI;
+
+})(GrabArt || (GrabArt = {}));
+
+var GrabArt;
+(function (GrabArt) {
+    var Application = (function () {
+        function Application(page) {
+            this.page = page;
+        }
+        Application.prototype.run = function () {
+            $(this.page).append(new GrabArt.UI.Widget('main').draw());
+        };
+        return Application;
+    })();
+    GrabArt.Application = Application;    
+})(GrabArt || (GrabArt = {}));
+
+var GrabArt;
+(function (GrabArt) {
     (function (Core) {
         var Console = (function () {
             function Console() { }
@@ -34,11 +151,6 @@ var GrabArt;
 
 })(GrabArt || (GrabArt = {}));
 
-var __extends = this.__extends || function (d, b) {
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-}
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -64,86 +176,6 @@ var GrabArt;
 
 var GrabArt;
 (function (GrabArt) {
-    (function (UI) {
-        var Widget = (function () {
-            function Widget(name) {
-                this.name = name;
-                this.position = {
-                    x: 0,
-                    y: 0,
-                    relative: "static"
-                };
-                this.sizes = {
-                    w: 100,
-                    h: 75
-                };
-                this.unit = 'px';
-                this.visible = true;
-                this.domId = null;
-                this.domElement = null;
-                this.init();
-            }
-            Widget.prototype.draw = function () {
-                var domElem = this.drawSelf();
-                for(var widgetName in this.widgets) {
-                    $(domElem).append(this.widgets[widgetName].draw());
-                }
-                return domElem;
-            };
-            Widget.prototype.drawSelf = function () {
-                if(this.domId === null) {
-                    this.domId = '' + this.getName() + new Date().getTime().toString();
-                    this.domElement = $('<div></div>');
-                    var $element = $(this.domElement).attr('id', this.domId);
-                    $element.css({
-                        left: this.position.x + this.unit
-                    }).css({
-                        top: this.position.y + this.unit
-                    }).css({
-                        width: this.sizes.w + this.unit
-                    }).css({
-                        height: this.sizes.h + this.unit
-                    });
-                    $element.css('position', this.position.relative || 'static');
-                }
-                return this.domElement;
-            };
-            Widget.prototype.addWidget = function (widget) {
-                this.widgets[widget.getName()] = widget;
-                return this;
-            };
-            Widget.prototype.getName = function () {
-                return this.name;
-            };
-            Widget.prototype.setPosition = function (pos) {
-                if(pos === null) {
-                    throw "pos is null";
-                }
-                this.position = pos;
-                return this;
-            };
-            Widget.prototype.getPosition = function () {
-                return this.position;
-            };
-            Widget.prototype.setSizes = function (sizes) {
-                if(sizes === null) {
-                    throw "pos is null";
-                }
-                this.sizes = sizes;
-                return this;
-            };
-            Widget.prototype.init = function () {
-            };
-            return Widget;
-        })();
-        UI.Widget = Widget;        
-    })(GrabArt.UI || (GrabArt.UI = {}));
-    var UI = GrabArt.UI;
-
-})(GrabArt || (GrabArt = {}));
-
-var GrabArt;
-(function (GrabArt) {
     (function (Tests) {
         (function (UI) {
             var WidgetTest = (function (_super) {
@@ -157,12 +189,15 @@ var GrabArt;
                 };
                 WidgetTest.prototype.testNewWidgetCreationWithoutParams = function () {
                     var testWidget = new GrabArt.UI.Widget('test');
-                    var domElem = testWidget.drawSelf();
+                    var domElem = testWidget.drawSelf()[0];
+                    var unit = testWidget.getUnit();
+
+                    console.log(domElem);
                     this.assertEquals('static', domElem.style.position);
-                    this.assertEquals(0, domElem.style.left);
-                    this.assertEquals(0, domElem.style.top);
-                    this.assertEquals(100, domElem.style.width);
-                    this.assertEquals(75, domElem.style.height);
+                    this.assertEquals(0 + unit, domElem.style.left);
+                    this.assertEquals(0 + unit, domElem.style.top);
+                    this.assertEquals(100 + unit, domElem.style.width);
+                    this.assertEquals(75 + unit, domElem.style.height);
                 };
                 return WidgetTest;
             })(GrabArt.Tests.TestCase);

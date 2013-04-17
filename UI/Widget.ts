@@ -14,12 +14,13 @@ module GrabArt.UI {
     }
 
     export /* abstract */ class Widget {
-        private position   : IPosition = { x : 0, y : 0, relative : "static" };
+        private position   : IPosition = { x : 0,   y : 0, relative : "static" };
         private sizes      : ISizes    = { w : 100, h : 75 };
         private unit       : string    = 'px';
         private visible    : bool      = true;
         private domId      : string    = null;
         private domElement : any       = null;
+        private bgColor    : string    = 'grey';
 
         private widgets    : { [name : string] : Widget; };
 
@@ -41,16 +42,17 @@ module GrabArt.UI {
             if (this.domId === null) {
                 this.domId      = '' + this.getName() + new Date().getTime().toString();
                 this.domElement = $('<div></div>');
-                var $element    = $(this.domElement).attr('id', this.domId);
-                $element.css({ left   : this.position.x + this.unit })
-                        .css({ top    : this.position.y + this.unit })
-                        .css({ width  : this.sizes.w    + this.unit })
-                        .css({ height : this.sizes.h    + this.unit });
 
-                $element.css(
-                      'position'
-                    , this.position.relative || 'static'
-                );
+                this.domElement
+                    .attr('id', this.domId)
+                    .css({
+                          left            : this.position.x + this.unit
+                        , top             : this.position.y + this.unit
+                        , width           : this.sizes.w    + this.unit
+                        , height          : this.sizes.h    + this.unit
+                        , backgroundColor : this.bgColor
+                        , position        : this.position.relative || 'static'
+                    });
 
             }
 
@@ -61,8 +63,6 @@ module GrabArt.UI {
             this.widgets[widget.getName()] = widget;
             return this;
         }
-
-
 
         getName() { return this.name; }
 
@@ -88,6 +88,10 @@ module GrabArt.UI {
             this.sizes = sizes;
 
             return this;
+        }
+
+        getUnit() : string {
+            return this.unit;
         }
 
         /* abstract */

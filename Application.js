@@ -1,12 +1,11 @@
 var GrabArt;
 (function (GrabArt) {
     var Application = (function () {
-        function Application() { }
+        function Application(page) {
+            this.page = page;
+        }
         Application.prototype.run = function () {
-            var container = this.configureWidgets(new GrabArt.UI.WidgetContainer());
-        };
-        Application.prototype.configureWidgets = function (wc) {
-            return wc;
+            $(this.page).append(new GrabArt.UI.Widget('main').draw());
         };
         return Application;
     })();
