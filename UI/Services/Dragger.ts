@@ -1,14 +1,14 @@
 /// <reference path="../../Core/Event.ts" />
 
 module GrabArt.UI.Services {
-    export interface IMovable {
+    export interface IDraggable {
         move   (dx : number, dy : number) : void;
         redraw ()                         : void;
     }
 
     export class Dragger {
 
-        private subject     : IMovable;
+        private subject     : IDraggable;
         private mouseMoveEv : GrabArt.Core.Event;
         private mouseDownEv : GrabArt.Core.Event;
         private mouseUpEv   : GrabArt.Core.Event;
@@ -21,7 +21,7 @@ module GrabArt.UI.Services {
         private previousY    : number;
 
         constructor(
-              subject        : IMovable
+              subject        : IDraggable
             , mouseMoveEvent : GrabArt.Core.Event
             , mouseDownEvent : GrabArt.Core.Event
             , mouseUpEvent   : GrabArt.Core.Event
@@ -57,6 +57,7 @@ module GrabArt.UI.Services {
                 this.mouseDownEv.addListener(this.turnOnDrag);
                 this.mouseUpEv.addListener(this.turnOffDrag);
                 this.mouseMoveEv.addListener(this.performDrag);
+
             }
         }
 

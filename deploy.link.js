@@ -2,7 +2,7 @@ var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
-}
+};
 var GrabArt;
 (function (GrabArt) {
     (function (Core) {
@@ -53,9 +53,7 @@ var GrabArt;
         Core.EntireEvent = EntireEvent;        
     })(GrabArt.Core || (GrabArt.Core = {}));
     var Core = GrabArt.Core;
-
 })(GrabArt || (GrabArt = {}));
-
 var GrabArt;
 (function (GrabArt) {
     (function (UI) {
@@ -122,12 +120,9 @@ var GrabArt;
             Services.Dragger = Dragger;            
         })(UI.Services || (UI.Services = {}));
         var Services = UI.Services;
-
     })(GrabArt.UI || (GrabArt.UI = {}));
     var UI = GrabArt.UI;
-
 })(GrabArt || (GrabArt = {}));
-
 var GrabArt;
 (function (GrabArt) {
     (function (UI) {
@@ -149,17 +144,24 @@ var GrabArt;
                 this.domId = null;
                 this.domElement = null;
                 this.bgColor = 'grey';
+                this.cursorStyle = 'default';
                 this.dragger = null;
                 this.widgets = {
                 };
                 this.mouseOverEv = new GrabArt.Core.EntireEvent();
+                this.mouseOutEv = new GrabArt.Core.EntireEvent();
+                this.mouseLeaveEv = new GrabArt.Core.EntireEvent();
                 this.mouseMoveEv = new GrabArt.Core.EntireEvent();
                 this.mouseDownEv = new GrabArt.Core.EntireEvent();
                 this.mouseUpEv = new GrabArt.Core.EntireEvent();
+                this.clickEv = new GrabArt.Core.EntireEvent();
                 this.MouseOver = this.mouseOverEv;
+                this.MouseOut = this.mouseOutEv;
+                this.MouseLeave = this.mouseLeaveEv;
                 this.MouseMove = this.mouseMoveEv;
                 this.MouseDown = this.mouseDownEv;
                 this.MouseUp = this.mouseUpEv;
+                this.Click = this.clickEv;
                 this.init();
             }
             Widget.prototype.draw = function () {
@@ -182,7 +184,8 @@ var GrabArt;
                     width: this.sizes.w + this.unit,
                     height: this.sizes.h + this.unit,
                     backgroundColor: this.bgColor,
-                    position: this.position.relative || this.defaultRelativePos
+                    position: this.position.relative || this.defaultRelativePos,
+                    cursor: this.cursorStyle
                 });
                 return this.domElement;
             };
@@ -193,6 +196,10 @@ var GrabArt;
                 var _this = this;
                 $(domElement).on('mouseover', function (event) {
                     return _this.mouseOverEv.fire(_this, event);
+                }).on('mouseout', function (event) {
+                    return _this.mouseOutEv.fire(_this, event);
+                }).on('mouseleave', function (event) {
+                    return _this.mouseLeaveEv.fire(_this, event);
                 }).on('mousemove', function (event) {
                     return _this.mouseMoveEv.fire(_this, event);
                 }).on('mousedown', function (event) {
@@ -238,11 +245,13 @@ var GrabArt;
                 return this.sizes;
             };
             Widget.prototype.enableDragging = function () {
-                this.getDragger().offDragging();
+                this.setCursorStyle('pointer');
+                this.getDragger().onDragging();
                 return this;
             };
             Widget.prototype.disableDragging = function () {
-                this.getDragger().onDragging();
+                this.setCursorStyle('default');
+                this.getDragger().offDragging();
                 return this;
             };
             Widget.prototype.getDragger = function () {
@@ -255,10 +264,14 @@ var GrabArt;
                 return this.unit;
             };
             Widget.prototype.setBackgroundColor = function (color) {
-                if(color === null) {
-                    throw "color is null";
+                if(color == null || color == '') {
+                    throw "color is empty";
                 }
                 this.bgColor = color;
+                return this;
+            };
+            Widget.prototype.setCursorStyle = function (style) {
+                this.cursorStyle = style;
                 return this;
             };
             Widget.prototype.init = function () {
@@ -268,9 +281,7 @@ var GrabArt;
         UI.Widget = Widget;        
     })(GrabArt.UI || (GrabArt.UI = {}));
     var UI = GrabArt.UI;
-
 })(GrabArt || (GrabArt = {}));
-
 var GrabArt;
 (function (GrabArt) {
     (function (GApp) {
@@ -296,30 +307,61 @@ var GrabArt;
             UI.MainWidget = MainWidget;            
         })(GApp.UI || (GApp.UI = {}));
         var UI = GApp.UI;
-
     })(GrabArt.GApp || (GrabArt.GApp = {}));
     var GApp = GrabArt.GApp;
-
 })(GrabArt || (GrabArt = {}));
-
+var GrabArt;
+(function (GrabArt) {
+    (function (UI) {
+        var Button = (function (_super) {
+            __extends(Button, _super);
+            function Button(name) {
+                        _super.call(this, name);
+                this.basicColor = 'aqua';
+                this.hoverColor = 'blue';
+                this.pressedColor = 'darkblue';
+                this.setBackgroundColor(this.basicColor);
+                this.initInteractionEvents();
+            }
+            Button.prototype.initInteractionEvents = function () {
+                var _this = this;
+                this.MouseOver.addListener(function (_1, _2) {
+                    _this.setBackgroundColor(_this.hoverColor);
+                    _this.redraw();
+                });
+                this.MouseLeave.addListener(function (_1, _2) {
+                    _this.setBackgroundColor(_this.basicColor);
+                    _this.redraw();
+                });
+            };
+            return Button;
+        })(UI.Widget);
+        UI.Button = Button;        
+    })(GrabArt.UI || (GrabArt.UI = {}));
+    var UI = GrabArt.UI;
+})(GrabArt || (GrabArt = {}));
 var GrabArt;
 (function (GrabArt) {
     var Application = (function () {
         function Application(page) {
             this.page = page;
         }
-        Application.prototype.run = function () {
-            var mainWindow = new GrabArt.GApp.UI.MainWidget('main');
-            var test = new GrabArt.UI.Widget('test').setBackgroundColor('red').enableDragging();
-
-            mainWindow.addWidget(test);
+        Application.prototype.main = function () {
+            var mainWindow = new GrabArt.GApp.UI.MainWidget('main'), test = new GrabArt.UI.Button('test');
+            mainWindow.addWidget(test).enableDragging();
             $(this.page).append(mainWindow.draw());
+        };
+        Application.prototype.run = function () {
+            try  {
+                this.main();
+            } catch (exc) {
+                GrabArt.Core.Console.writeLine('Exception: ' + exc, 'red');
+            }
         };
         return Application;
     })();
     GrabArt.Application = Application;    
 })(GrabArt || (GrabArt = {}));
-
 var GrabArt;
 (function (GrabArt) {
     (function (Core) {
@@ -328,15 +370,13 @@ var GrabArt;
             Console.writeLine = function writeLine(text, color) {
                 if (typeof color === "undefined") { color = "black"; }
                 $('#consoleContent').append($('<div></div>').html('> ' + text).css('color', color));
-            }
+            };
             return Console;
         })();
         Core.Console = Console;        
     })(GrabArt.Core || (GrabArt.Core = {}));
     var Core = GrabArt.Core;
-
 })(GrabArt || (GrabArt = {}));
-
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -353,9 +393,7 @@ var GrabArt;
         Tests.TestCase = TestCase;        
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
-
 })(GrabArt || (GrabArt = {}));
-
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -376,9 +414,7 @@ var GrabArt;
         Tests.SampleTest = SampleTest;        
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
-
 })(GrabArt || (GrabArt = {}));
-
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -393,10 +429,7 @@ var GrabArt;
                     return 'UI.Widget tests';
                 };
                 WidgetTest.prototype.testNewWidgetCreationWithoutParams = function () {
-                    var testWidget = new GrabArt.UI.Widget('test');
-                    var domElem = testWidget.drawSelf()[0];
-                    var unit = testWidget.getUnit();
-
+                    var testWidget = new GrabArt.UI.Widget('test'), domElem = testWidget.drawSelf()[0], unit = testWidget.getUnit();
                     this.assertEquals('absolute', domElem.style.position);
                     this.assertEquals(0 + unit, domElem.style.left);
                     this.assertEquals(0 + unit, domElem.style.top);
@@ -407,10 +440,7 @@ var GrabArt;
                     var testWidget = new GrabArt.UI.Widget('test').setSizes({
                         w: 200,
                         h: 200
-                    });
-                    var domElem = testWidget.drawSelf()[0];
-                    var unit = testWidget.getUnit();
-
+                    }), domElem = testWidget.drawSelf()[0], unit = testWidget.getUnit();
                     this.assertEquals(200 + unit, domElem.style.width);
                     this.assertEquals(200 + unit, domElem.style.height);
                 };
@@ -418,9 +448,7 @@ var GrabArt;
                     var testWidget = new GrabArt.UI.Widget('test').setSizes({
                         w: 200,
                         h: 200
-                    });
-                    var unit = testWidget.getUnit();
-
+                    }), unit = testWidget.getUnit();
                     this.assertEquals(200, testWidget.getSizes().w);
                     this.assertEquals(200, testWidget.getSizes().h);
                 };
@@ -429,12 +457,45 @@ var GrabArt;
             UI.WidgetTest = WidgetTest;            
         })(Tests.UI || (Tests.UI = {}));
         var UI = Tests.UI;
-
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
-
 })(GrabArt || (GrabArt = {}));
-
+var GrabArt;
+(function (GrabArt) {
+    (function (Tests) {
+        (function (UI) {
+            (function (Services) {
+                (function (Mocks) {
+                    var DraggerTestSubjectMock = (function () {
+                        function DraggerTestSubjectMock() {
+                            this.mouseMoveEv = new GrabArt.Core.EntireEvent();
+                            this.mouseDownEv = new GrabArt.Core.EntireEvent();
+                            this.mouseUpEv = new GrabArt.Core.EntireEvent();
+                            this.moved = {
+                                dx: 0,
+                                dy: 0
+                            };
+                            this.redrawed = false;
+                        }
+                        DraggerTestSubjectMock.prototype.move = function (dx, dy) {
+                            this.moved.dx = dx;
+                            this.moved.dy = dy;
+                        };
+                        DraggerTestSubjectMock.prototype.redraw = function () {
+                            this.redrawed = true;
+                        };
+                        return DraggerTestSubjectMock;
+                    })();
+                    Mocks.DraggerTestSubjectMock = DraggerTestSubjectMock;                    
+                })(Services.Mocks || (Services.Mocks = {}));
+                var Mocks = Services.Mocks;
+            })(UI.Services || (UI.Services = {}));
+            var Services = UI.Services;
+        })(Tests.UI || (Tests.UI = {}));
+        var UI = Tests.UI;
+    })(GrabArt.Tests || (GrabArt.Tests = {}));
+    var Tests = GrabArt.Tests;
+})(GrabArt || (GrabArt = {}));
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -449,20 +510,93 @@ var GrabArt;
                     DraggerTest.prototype.getDescription = function () {
                         return 'UI.Services.Dragger tests';
                     };
+                    DraggerTest.prototype.setUp = function () {
+                        var mock = new GrabArt.Tests.UI.Services.Mocks.DraggerTestSubjectMock();
+                        return {
+                            mock: mock,
+                            subject: new GrabArt.UI.Services.Dragger(mock, mock.mouseMoveEv, mock.mouseDownEv, mock.mouseUpEv)
+                        };
+                    };
+                    DraggerTest.prototype.testDraggingProperWork = function () {
+                        var setup = this.setUp(), mock = setup.mock, subject = setup.subject;
+                        subject.onDragging();
+                        mock.mouseDownEv.fire(mock, {
+                            clientX: 0,
+                            clientY: 0
+                        });
+                        mock.mouseMoveEv.fire(mock, {
+                            clientX: 5,
+                            clientY: 10
+                        });
+                        this.assertEquals(5, mock.moved.dx);
+                        this.assertEquals(10, mock.moved.dy);
+                        this.assertEquals(true, mock.redrawed);
+                    };
+                    DraggerTest.prototype.testNotDraggingAfterTurnOff = function () {
+                        var setup = this.setUp(), mock = setup.mock, subject = setup.subject;
+                        subject.onDragging();
+                        subject.offDragging();
+                        mock.mouseDownEv.fire(mock, {
+                            clientX: 0,
+                            clientY: 0
+                        });
+                        mock.mouseMoveEv.fire(mock, {
+                            clientX: 5,
+                            clientY: 10
+                        });
+                        this.assertEquals(0, mock.moved.dx);
+                        this.assertEquals(0, mock.moved.dy);
+                        this.assertEquals(false, mock.redrawed);
+                    };
+                    DraggerTest.prototype.testNotDraggingAfterMovingAndThenTurnOff = function () {
+                        var setup = this.setUp(), mock = setup.mock, subject = setup.subject;
+                        subject.onDragging();
+                        mock.mouseDownEv.fire(mock, {
+                            clientX: 0,
+                            clientY: 0
+                        });
+                        mock.mouseMoveEv.fire(mock, {
+                            clientX: 5,
+                            clientY: 10
+                        });
+                        subject.offDragging();
+                        mock.mouseMoveEv.fire(mock, {
+                            clientX: 5,
+                            clientY: 10
+                        });
+                        this.assertEquals(5, mock.moved.dx);
+                        this.assertEquals(10, mock.moved.dy);
+                    };
+                    DraggerTest.prototype.testNotDraggingAfterMouseUp = function () {
+                        var setup = this.setUp(), mock = setup.mock, subject = setup.subject;
+                        subject.onDragging();
+                        mock.mouseDownEv.fire(mock, {
+                            clientX: 0,
+                            clientY: 0
+                        });
+                        mock.mouseMoveEv.fire(mock, {
+                            clientX: 5,
+                            clientY: 10
+                        });
+                        mock.mouseUpEv.fire(mock, {
+                        });
+                        mock.mouseMoveEv.fire(mock, {
+                            clientX: 5,
+                            clientY: 10
+                        });
+                        this.assertEquals(5, mock.moved.dx);
+                        this.assertEquals(10, mock.moved.dy);
+                    };
                     return DraggerTest;
                 })(GrabArt.Tests.TestCase);
                 Services.DraggerTest = DraggerTest;                
             })(UI.Services || (UI.Services = {}));
             var Services = UI.Services;
-
         })(Tests.UI || (Tests.UI = {}));
         var UI = Tests.UI;
-
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
-
 })(GrabArt || (GrabArt = {}));
-
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -477,26 +611,18 @@ var GrabArt;
                     return 'Core.Event tests';
                 };
                 EventsTest.prototype.testEventsProperWorkWithCasts = function () {
-                    var entireEvent = new GrabArt.Core.EntireEvent();
-                    var event = entireEvent;
-                    var callsNum = 0;
-                    var testCallback = function (sender, args) {
+                    var entireEvent = new GrabArt.Core.EntireEvent(), event = entireEvent, callsNum = 0, testCallback = function (sender, args) {
                         callsNum += 1;
                     };
-
                     event.addListener(testCallback);
                     entireEvent.fire({
                     }, '');
                     this.assertEquals(1, callsNum);
                 };
                 EventsTest.prototype.testAddAndDeleteCallbackFromEvent = function () {
-                    var entireEvent = new GrabArt.Core.EntireEvent();
-                    var event = entireEvent;
-                    var callsNum = 0;
-                    var testCallback = function (sender, args) {
+                    var entireEvent = new GrabArt.Core.EntireEvent(), event = entireEvent, callsNum = 0, testCallback = function (sender, args) {
                         callsNum += 1;
                     };
-
                     event.addListener(testCallback);
                     entireEvent.fire({
                     }, '');
@@ -509,12 +635,9 @@ var GrabArt;
             Core.EventsTest = EventsTest;            
         })(Tests.Core || (Tests.Core = {}));
         var Core = Tests.Core;
-
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
-
 })(GrabArt || (GrabArt = {}));
-
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -549,6 +672,4 @@ var GrabArt;
         Tests.TestSuit = TestSuit;        
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
-
 })(GrabArt || (GrabArt = {}));
-

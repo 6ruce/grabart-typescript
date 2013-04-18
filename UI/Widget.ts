@@ -28,27 +28,37 @@ module GrabArt.UI {
         private domId       : string    = null;
         private domElement  : any       = null;
         private bgColor     : string    = 'grey';
+        private cursorStyle : string    = 'default';
 
         private dragger     : GrabArt.UI.Services.Dragger   = null;
 
         private widgets     : { [name : string] : Widget; } = {};
 
-        private mouseOverEv : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
-        private mouseMoveEv : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
-        private mouseDownEv : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
-        private mouseUpEv   : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseOverEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseOutEv   : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseLeaveEv : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseMoveEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseDownEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseUpEv    : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private clickEv      : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
 
         public  MouseOver   : GrabArt.Core.Event;
+        public  MouseOut    : GrabArt.Core.Event;
+        public  MouseLeave  : GrabArt.Core.Event;
         public  MouseMove   : GrabArt.Core.Event;
         public  MouseDown   : GrabArt.Core.Event;
         public  MouseUp     : GrabArt.Core.Event;
+        public  Click       : GrabArt.Core.Event;
 
 
         constructor (private name : string) {
-            this.MouseOver = this.mouseOverEv;
-            this.MouseMove = this.mouseMoveEv;
-            this.MouseDown = this.mouseDownEv;
-            this.MouseUp   = this.mouseUpEv;
+            this.MouseOver   = this.mouseOverEv;
+            this.MouseOut    = this.mouseOutEv;
+            this.MouseLeave  = this.mouseLeaveEv;
+            this.MouseMove   = this.mouseMoveEv;
+            this.MouseDown   = this.mouseDownEv;
+            this.MouseUp     = this.mouseUpEv;
+            this.Click       = this.clickEv;
 
             this.init();
         }
@@ -79,6 +89,7 @@ module GrabArt.UI {
                     , height          : this.sizes.h    + this.unit
                     , backgroundColor : this.bgColor
                     , position        : this.position.relative || this.defaultRelativePos
+                    , cursor          : this.cursorStyle
                 });
 
             return this.domElement;
@@ -89,10 +100,12 @@ module GrabArt.UI {
         }
 
         private bindEvents(domElement : Object) : void {
-            $(domElement).on('mouseover', (event) => this.mouseOverEv.fire(this, event))
-                         .on('mousemove', (event) => this.mouseMoveEv.fire(this, event))
-                         .on('mousedown', (event) => this.mouseDownEv.fire(this, event))
-                         .on('mouseup'  , (event) => this.mouseUpEv.fire(this, event));
+            $(domElement).on('mouseover'  , (event) => this.mouseOverEv.fire(this, event))
+                         .on('mouseout'   , (event) => this.mouseOutEv.fire(this, event))
+                         .on('mouseleave' , (event) => this.mouseLeaveEv.fire(this, event))
+                         .on('mousemove'  , (event) => this.mouseMoveEv.fire(this, event))
+                         .on('mousedown'  , (event) => this.mouseDownEv.fire(this, event))
+                         .on('mouseup'    , (event) => this.mouseUpEv.fire(this, event));
         }
 
         move(dx : number, dy : number) : void {
@@ -141,12 +154,14 @@ module GrabArt.UI {
         }
 
         enableDragging() : Widget {
-            this.getDragger().offDragging();
+            this.setCursorStyle('pointer');
+            this.getDragger().onDragging();
             return this;
         }
 
         disableDragging() : Widget {
-            this.getDragger().onDragging();
+            this.setCursorStyle('default');
+            this.getDragger().offDragging();
             return this;
         }
 
@@ -168,12 +183,17 @@ module GrabArt.UI {
         }
 
         setBackgroundColor(color : string) : Widget {
-            if (color === null) {
-                throw "color is null";
+            if (color == null || color == '') {
+                throw "color is empty";
             }
 
             this.bgColor = color;
 
+            return this;
+        }
+
+        setCursorStyle(style : string) : Widget {
+            this.cursorStyle = style;
             return this;
         }
 

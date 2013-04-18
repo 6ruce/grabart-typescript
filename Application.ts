@@ -1,4 +1,5 @@
 /// <reference  path="GApp/UI/MainWidget.ts" />
+/// <reference  path="UI/Button.ts"          />
 /// <reference_ path="jquery.d.ts"           />
 
 module GrabArt {
@@ -6,14 +7,22 @@ module GrabArt {
     export class Application {
         constructor(private page){}
 
-        run () : void {
+        main() : void {
             var mainWindow = new GrabArt.GApp.UI.MainWidget('main'),
-                test       = new GrabArt.UI.Widget('test').setBackgroundColor('red')
-                                                          .enableDragging()
-            mainWindow.addWidget(test);
+                test       = new GrabArt.UI.Button('test');
+
+            mainWindow.addWidget(test).enableDragging();
             //mainWindow.enableDragging();
 
             $(this.page).append(mainWindow.draw());
+        }
+
+        run () : void {
+            try {
+                this.main();
+            } catch (exc) {
+                GrabArt.Core.Console.writeLine('Exception: ' + exc, 'red');
+            }
         }
     }
 }
