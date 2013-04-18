@@ -2,7 +2,7 @@ var __extends = this.__extends || function (d, b) {
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
-};
+}
 var GrabArt;
 (function (GrabArt) {
     (function (Core) {
@@ -53,13 +53,88 @@ var GrabArt;
         Core.EntireEvent = EntireEvent;        
     })(GrabArt.Core || (GrabArt.Core = {}));
     var Core = GrabArt.Core;
+
 })(GrabArt || (GrabArt = {}));
+
+var GrabArt;
+(function (GrabArt) {
+    (function (UI) {
+        (function (Services) {
+            var Dragger = (function () {
+                function Dragger(subject, mouseMoveEvent, mouseDownEvent, mouseUpEvent) {
+                    this.dragging = false;
+                    this.turnOnDrag = null;
+                    this.turnOffDrag = null;
+                    this.performDrag = null;
+                    if(subject == null) {
+                        throw 'subject is null';
+                    }
+                    if(mouseMoveEvent == null) {
+                        throw 'mouseMoveEvent is null';
+                    }
+                    if(mouseDownEvent == null) {
+                        throw 'mouseDownEvent is null';
+                    }
+                    if(mouseUpEvent == null) {
+                        throw 'mouseUpEvent is null';
+                    }
+                    this.subject = subject;
+                    this.mouseMoveEv = mouseMoveEvent;
+                    this.mouseDownEv = mouseDownEvent;
+                    this.mouseUpEv = mouseUpEvent;
+                }
+                Dragger.prototype.onDragging = function () {
+                    var _this = this;
+                    if(this.turnOnDrag === null) {
+                        this.performDrag = function (sender, args) {
+                            if(_this.dragging) {
+                                _this.subject.move(args.clientX - _this.previousX, args.clientY - _this.previousY);
+                                _this.subject.redraw();
+                                _this.previousX = args.clientX;
+                                _this.previousY = args.clientY;
+                            }
+                        };
+                        this.turnOnDrag = function (_, args) {
+                            _this.dragging = true;
+                            _this.previousX = args.clientX;
+                            _this.previousY = args.clientY;
+                        };
+                        this.turnOffDrag = function (_1, _2) {
+                            return _this.dragging = false;
+                        };
+                        this.mouseDownEv.addListener(this.turnOnDrag);
+                        this.mouseUpEv.addListener(this.turnOffDrag);
+                        this.mouseMoveEv.addListener(this.performDrag);
+                    }
+                };
+                Dragger.prototype.offDragging = function () {
+                    if(this.turnOnDrag !== null) {
+                        this.mouseDownEv.removeListener(this.turnOnDrag);
+                        this.mouseUpEv.removeListener(this.turnOffDrag);
+                        this.mouseMoveEv.removeListener(this.performDrag);
+                        this.turnOnDrag = null;
+                        this.turnOffDrag = null;
+                        this.performDrag = null;
+                    }
+                };
+                return Dragger;
+            })();
+            Services.Dragger = Dragger;            
+        })(UI.Services || (UI.Services = {}));
+        var Services = UI.Services;
+
+    })(GrabArt.UI || (GrabArt.UI = {}));
+    var UI = GrabArt.UI;
+
+})(GrabArt || (GrabArt = {}));
+
 var GrabArt;
 (function (GrabArt) {
     (function (UI) {
         var Widget = (function () {
             function Widget(name) {
                 this.name = name;
+                this.defaultRelativePos = 'absolute';
                 this.position = {
                     x: 0,
                     y: 0,
@@ -74,10 +149,7 @@ var GrabArt;
                 this.domId = null;
                 this.domElement = null;
                 this.bgColor = 'grey';
-                this.dragging = false;
-                this.turnOnDragg = null;
-                this.turnOffDragg = null;
-                this.performDragg = null;
+                this.dragger = null;
                 this.widgets = {
                 };
                 this.mouseOverEv = new GrabArt.Core.EntireEvent();
@@ -110,9 +182,12 @@ var GrabArt;
                     width: this.sizes.w + this.unit,
                     height: this.sizes.h + this.unit,
                     backgroundColor: this.bgColor,
-                    position: this.position.relative || 'relative'
+                    position: this.position.relative || this.defaultRelativePos
                 });
                 return this.domElement;
+            };
+            Widget.prototype.redraw = function () {
+                this.drawSelf();
             };
             Widget.prototype.bindEvents = function (domElement) {
                 var _this = this;
@@ -146,7 +221,7 @@ var GrabArt;
                 }
                 this.position.x = position.x;
                 this.position.y = position.y;
-                this.position.relative = position.relative || this.position.relative || 'static';
+                this.position.relative = position.relative || this.position.relative || this.defaultRelativePos;
                 return this;
             };
             Widget.prototype.getPosition = function () {
@@ -163,43 +238,18 @@ var GrabArt;
                 return this.sizes;
             };
             Widget.prototype.enableDragging = function () {
-                var _this = this;
-                if(this.turnOnDragg === null) {
-                    this.performDragg = function (sender, args) {
-                        if(_this.dragging) {
-                            _this.move(args.clientX - _this.previosX, args.clientY - _this.previosY);
-                            _this.drawSelf();
-                            _this.previosX = args.clientX;
-                            _this.previosY = args.clientY;
-                        }
-                    };
-                    this.turnOnDragg = function (_1, args) {
-                        _this.dragging = true;
-                        _this.previosX = args.clientX;
-                        _this.previosY = args.clientY;
-                    };
-                    this.turnOffDragg = function (_1, _2) {
-                        return _this.dragging = false;
-                    };
-                    this.MouseDown.addListener(this.turnOnDragg);
-                    this.MouseUp.addListener(this.turnOffDragg);
-                    this.MouseMove.addListener(this.performDragg);
-                }
+                this.getDragger().offDragging();
                 return this;
             };
             Widget.prototype.disableDragging = function () {
-                if(this.turnOnDragg !== null) {
-                    this.MouseDown.removeListener(this.turnOnDragg);
-                    this.MouseUp.removeListener(this.turnOffDragg);
-                    this.MouseMove.removeListener(this.performDragg);
-                    this.turnOnDragg = null;
-                    this.turnOffDragg = null;
-                    this.performDragg = null;
-                }
+                this.getDragger().onDragging();
                 return this;
             };
-            Widget.prototype.changeDragging = function (dragging) {
-                this.dragging = dragging;
+            Widget.prototype.getDragger = function () {
+                if(this.dragger === null) {
+                    this.dragger = new GrabArt.UI.Services.Dragger(this, this.MouseMove, this.MouseDown, this.MouseUp);
+                }
+                return this.dragger;
             };
             Widget.prototype.getUnit = function () {
                 return this.unit;
@@ -218,7 +268,9 @@ var GrabArt;
         UI.Widget = Widget;        
     })(GrabArt.UI || (GrabArt.UI = {}));
     var UI = GrabArt.UI;
+
 })(GrabArt || (GrabArt = {}));
+
 var GrabArt;
 (function (GrabArt) {
     (function (GApp) {
@@ -244,9 +296,12 @@ var GrabArt;
             UI.MainWidget = MainWidget;            
         })(GApp.UI || (GApp.UI = {}));
         var UI = GApp.UI;
+
     })(GrabArt.GApp || (GrabArt.GApp = {}));
     var GApp = GrabArt.GApp;
+
 })(GrabArt || (GrabArt = {}));
+
 var GrabArt;
 (function (GrabArt) {
     var Application = (function () {
@@ -254,7 +309,9 @@ var GrabArt;
             this.page = page;
         }
         Application.prototype.run = function () {
-            var mainWindow = new GrabArt.GApp.UI.MainWidget('main'), test = new GrabArt.UI.Widget('test').setBackgroundColor('red').enableDragging();
+            var mainWindow = new GrabArt.GApp.UI.MainWidget('main');
+            var test = new GrabArt.UI.Widget('test').setBackgroundColor('red').enableDragging();
+
             mainWindow.addWidget(test);
             $(this.page).append(mainWindow.draw());
         };
@@ -262,6 +319,7 @@ var GrabArt;
     })();
     GrabArt.Application = Application;    
 })(GrabArt || (GrabArt = {}));
+
 var GrabArt;
 (function (GrabArt) {
     (function (Core) {
@@ -270,13 +328,15 @@ var GrabArt;
             Console.writeLine = function writeLine(text, color) {
                 if (typeof color === "undefined") { color = "black"; }
                 $('#consoleContent').append($('<div></div>').html('> ' + text).css('color', color));
-            };
+            }
             return Console;
         })();
         Core.Console = Console;        
     })(GrabArt.Core || (GrabArt.Core = {}));
     var Core = GrabArt.Core;
+
 })(GrabArt || (GrabArt = {}));
+
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -293,7 +353,9 @@ var GrabArt;
         Tests.TestCase = TestCase;        
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
+
 })(GrabArt || (GrabArt = {}));
+
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -314,7 +376,9 @@ var GrabArt;
         Tests.SampleTest = SampleTest;        
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
+
 })(GrabArt || (GrabArt = {}));
+
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -329,8 +393,11 @@ var GrabArt;
                     return 'UI.Widget tests';
                 };
                 WidgetTest.prototype.testNewWidgetCreationWithoutParams = function () {
-                    var testWidget = new GrabArt.UI.Widget('test'), domElem = testWidget.drawSelf()[0], unit = testWidget.getUnit();
-                    this.assertEquals('static', domElem.style.position);
+                    var testWidget = new GrabArt.UI.Widget('test');
+                    var domElem = testWidget.drawSelf()[0];
+                    var unit = testWidget.getUnit();
+
+                    this.assertEquals('absolute', domElem.style.position);
                     this.assertEquals(0 + unit, domElem.style.left);
                     this.assertEquals(0 + unit, domElem.style.top);
                     this.assertEquals(100 + unit, domElem.style.width);
@@ -340,7 +407,10 @@ var GrabArt;
                     var testWidget = new GrabArt.UI.Widget('test').setSizes({
                         w: 200,
                         h: 200
-                    }), domElem = testWidget.drawSelf()[0], unit = testWidget.getUnit();
+                    });
+                    var domElem = testWidget.drawSelf()[0];
+                    var unit = testWidget.getUnit();
+
                     this.assertEquals(200 + unit, domElem.style.width);
                     this.assertEquals(200 + unit, domElem.style.height);
                 };
@@ -348,7 +418,9 @@ var GrabArt;
                     var testWidget = new GrabArt.UI.Widget('test').setSizes({
                         w: 200,
                         h: 200
-                    }), unit = testWidget.getUnit();
+                    });
+                    var unit = testWidget.getUnit();
+
                     this.assertEquals(200, testWidget.getSizes().w);
                     this.assertEquals(200, testWidget.getSizes().h);
                 };
@@ -357,9 +429,40 @@ var GrabArt;
             UI.WidgetTest = WidgetTest;            
         })(Tests.UI || (Tests.UI = {}));
         var UI = Tests.UI;
+
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
+
 })(GrabArt || (GrabArt = {}));
+
+var GrabArt;
+(function (GrabArt) {
+    (function (Tests) {
+        (function (UI) {
+            (function (Services) {
+                var DraggerTest = (function (_super) {
+                    __extends(DraggerTest, _super);
+                    function DraggerTest() {
+                        _super.apply(this, arguments);
+
+                    }
+                    DraggerTest.prototype.getDescription = function () {
+                        return 'UI.Services.Dragger tests';
+                    };
+                    return DraggerTest;
+                })(GrabArt.Tests.TestCase);
+                Services.DraggerTest = DraggerTest;                
+            })(UI.Services || (UI.Services = {}));
+            var Services = UI.Services;
+
+        })(Tests.UI || (Tests.UI = {}));
+        var UI = Tests.UI;
+
+    })(GrabArt.Tests || (GrabArt.Tests = {}));
+    var Tests = GrabArt.Tests;
+
+})(GrabArt || (GrabArt = {}));
+
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -374,18 +477,26 @@ var GrabArt;
                     return 'Core.Event tests';
                 };
                 EventsTest.prototype.testEventsProperWorkWithCasts = function () {
-                    var entireEvent = new GrabArt.Core.EntireEvent(), event = entireEvent, callsNum = 0, testCallback = function (sender, args) {
+                    var entireEvent = new GrabArt.Core.EntireEvent();
+                    var event = entireEvent;
+                    var callsNum = 0;
+                    var testCallback = function (sender, args) {
                         callsNum += 1;
                     };
+
                     event.addListener(testCallback);
                     entireEvent.fire({
                     }, '');
                     this.assertEquals(1, callsNum);
                 };
                 EventsTest.prototype.testAddAndDeleteCallbackFromEvent = function () {
-                    var entireEvent = new GrabArt.Core.EntireEvent(), event = entireEvent, callsNum = 0, testCallback = function (sender, args) {
+                    var entireEvent = new GrabArt.Core.EntireEvent();
+                    var event = entireEvent;
+                    var callsNum = 0;
+                    var testCallback = function (sender, args) {
                         callsNum += 1;
                     };
+
                     event.addListener(testCallback);
                     entireEvent.fire({
                     }, '');
@@ -398,9 +509,12 @@ var GrabArt;
             Core.EventsTest = EventsTest;            
         })(Tests.Core || (Tests.Core = {}));
         var Core = Tests.Core;
+
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
+
 })(GrabArt || (GrabArt = {}));
+
 var GrabArt;
 (function (GrabArt) {
     (function (Tests) {
@@ -426,7 +540,8 @@ var GrabArt;
             TestSuit.prototype.configure = function () {
                 return [
                     new Tests.UI.WidgetTest(), 
-                    new Tests.Core.EventsTest()
+                    new Tests.Core.EventsTest(), 
+                    new Tests.UI.Services.DraggerTest()
                 ];
             };
             return TestSuit;
@@ -434,4 +549,6 @@ var GrabArt;
         Tests.TestSuit = TestSuit;        
     })(GrabArt.Tests || (GrabArt.Tests = {}));
     var Tests = GrabArt.Tests;
+
 })(GrabArt || (GrabArt = {}));
+

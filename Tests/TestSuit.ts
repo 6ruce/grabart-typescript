@@ -3,6 +3,7 @@
 /// <reference path="TestCase.ts" />
 /// <reference path="SampleTest.ts" />
 /// <reference path="UI/WidgetTest.ts" />
+/// <reference path="UI/Services/DraggerTest.ts" />
 /// <reference path="Core/EventsTest.ts" />
 
 module GrabArt.Tests {
@@ -35,7 +36,8 @@ module GrabArt.Tests {
         private configure() : ITestCase[] {
             return [
                 new UI.WidgetTest(),
-                new Core.EventsTest()
+                new Core.EventsTest(),
+                new UI.Services.DraggerTest()
             ];
         }
     }

@@ -12,7 +12,7 @@ module GrabArt.Tests.UI {
                 , domElem    = testWidget.drawSelf()[0]
                 , unit       = testWidget.getUnit();
 
-            this.assertEquals('static'   , domElem.style.position);
+            this.assertEquals('absolute'   , domElem.style.position);
             this.assertEquals(0   + unit , domElem.style.left    );
             this.assertEquals(0   + unit , domElem.style.top     );
             this.assertEquals(100 + unit , domElem.style.width   );

@@ -1,5 +1,6 @@
-/// <reference_ path="../jquery.d.ts"   />
-/// <reference  path="../Core/Event.ts" />
+/// <reference_ path="../jquery.d.ts"     />
+/// <reference  path="../Core/Event.ts"   />
+/// <reference  path="Services/Dragger.ts" />
 
 module GrabArt.UI {
     declare var $;
@@ -15,7 +16,11 @@ module GrabArt.UI {
         h : number;
     }
 
-    export /* abstract */ class Widget {
+    export /** abstract */ class Widget {
+
+        /** const */
+        private defaultRelativePos = 'absolute';
+
         private position    : IPosition = { x : 0,   y : 0, relative : 'absolute' };
         private sizes       : ISizes    = { w : 100, h : 75 };
         private unit        : string    = 'px';
@@ -24,12 +29,7 @@ module GrabArt.UI {
         private domElement  : any       = null;
         private bgColor     : string    = 'grey';
 
-        private dragging     : bool      = false;
-        private turnOnDragg  : (sender : Object, args : any) => void = null;
-        private turnOffDragg : (sender : Object, args : any) => void = null;
-        private performDragg : (sender : Object, args : any) => void = null;
-        private previosX     : number;
-        private previosY     : number;
+        private dragger     : GrabArt.UI.Services.Dragger   = null;
 
         private widgets     : { [name : string] : Widget; } = {};
 
@@ -78,10 +78,14 @@ module GrabArt.UI {
                     , width           : this.sizes.w    + this.unit
                     , height          : this.sizes.h    + this.unit
                     , backgroundColor : this.bgColor
-                    , position        : this.position.relative || 'relative'
+                    , position        : this.position.relative || this.defaultRelativePos
                 });
 
             return this.domElement;
+        }
+
+        redraw() : void {
+            this.drawSelf();
         }
 
         private bindEvents(domElement : Object) : void {
@@ -113,7 +117,7 @@ module GrabArt.UI {
 
             this.position.x        = position.x;
             this.position.y        = position.y;
-            this.position.relative = position.relative || this.position.relative || 'static';
+            this.position.relative = position.relative || this.position.relative || this.defaultRelativePos;
 
             return this;
         }
@@ -137,43 +141,26 @@ module GrabArt.UI {
         }
 
         enableDragging() : Widget {
-            if (this.turnOnDragg === null) {
-                this.performDragg = (sender, args) => {
-                    if (this.dragging) {
-                        this.move(args.clientX - this.previosX, args.clientY - this.previosY);
-                        this.drawSelf();
-                        this.previosX = args.clientX;
-                        this.previosY = args.clientY;
-                    }
-                }
-                this.turnOnDragg  = (_1, args) => {
-                    this.dragging = true;
-                    this.previosX = args.clientX;
-                    this.previosY = args.clientY;
-                }
-                this.turnOffDragg = (_1, _2) => this.dragging = false;
-                this.MouseDown.addListener(this.turnOnDragg);
-                this.MouseUp.addListener(this.turnOffDragg);
-                this.MouseMove.addListener(this.performDragg);
-            }
-
+            this.getDragger().offDragging();
             return this;
         }
 
         disableDragging() : Widget {
-            if (this.turnOnDragg !== null) {
-                this.MouseDown.removeListener(this.turnOnDragg);
-                this.MouseUp.removeListener(this.turnOffDragg);
-                this.MouseMove.removeListener(this.performDragg);
-                this.turnOnDragg  = null;
-                this.turnOffDragg = null;
-                this.performDragg = null;
-            }
+            this.getDragger().onDragging();
             return this;
         }
 
-        private changeDragging(dragging : bool) : void {
-            this.dragging = dragging;
+        getDragger() : GrabArt.UI.Services.Dragger {
+            if (this.dragger === null) {
+                this.dragger = new GrabArt.UI.Services.Dragger(
+                      this
+                    , this.MouseMove
+                    , this.MouseDown
+                    , this.MouseUp
+                );
+            }
+
+            return this.dragger;
         }
 
         getUnit() : string {
