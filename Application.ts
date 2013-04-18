@@ -7,13 +7,11 @@ module GrabArt {
         constructor(private page){}
 
         run () : void {
-            var mainWindow = new GrabArt.GApp.UI.MainWidget('main');
-            mainWindow.addWidget(
-                new GrabArt.UI.Widget('test')
-                    .setBackgroundColor('red')
-            );
-
-            mainWindow.MouseMove.addListener((sender, args) => { console.log(args);});
+            var mainWindow = new GrabArt.GApp.UI.MainWidget('main'),
+                test       = new GrabArt.UI.Widget('test').setBackgroundColor('red')
+                                                          .enableDragging()
+            mainWindow.addWidget(test);
+            //mainWindow.enableDragging();
 
             $(this.page).append(mainWindow.draw());
         }

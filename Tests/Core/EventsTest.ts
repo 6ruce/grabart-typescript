@@ -18,5 +18,19 @@ module GrabArt.Tests.Core {
 
             this.assertEquals(1, callsNum);
         }
+
+        testAddAndDeleteCallbackFromEvent() : void {
+            var   entireEvent : GrabArt.Core.EntireEvent  = new GrabArt.Core.EntireEvent()
+                , event       : GrabArt.Core.Event        = entireEvent
+                , callsNum    : number                    = 0
+                , testCallback = (sender : Object, args : any) : void => { callsNum += 1 };
+
+            event.addListener(testCallback);
+            entireEvent.fire({}, '');
+            this.assertEquals(1, callsNum);
+
+            event.removeListener(testCallback);
+            this.assertEquals(1, callsNum);
+        }
     }
 }

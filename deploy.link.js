@@ -14,6 +14,16 @@ var GrabArt;
                 this.handlers.push(handler);
                 return this;
             };
+            Event.prototype.removeListener = function (handler) {
+                if(this.handlers.length != 0) {
+                    for(var i in this.handlers) {
+                        if(handler == this.handlers[i]) {
+                            delete this.handlers[i];
+                        }
+                    }
+                }
+                return this;
+            };
             return Event;
         })();
         Core.Event = Event;        
@@ -28,6 +38,13 @@ var GrabArt;
                 if(this.handlers.length != 0) {
                     for(var i in this.handlers) {
                         this.handlers[i](sender, args);
+                    }
+                }
+            };
+            EntireEvent.prototype.clear = function () {
+                if(this.handlers.length != 0) {
+                    for(var i in this.handlers) {
+                        delete this.handlers[i];
                     }
                 }
             };
@@ -46,7 +63,7 @@ var GrabArt;
                 this.position = {
                     x: 0,
                     y: 0,
-                    relative: "static"
+                    relative: 'absolute'
                 };
                 this.sizes = {
                     w: 100,
@@ -57,12 +74,20 @@ var GrabArt;
                 this.domId = null;
                 this.domElement = null;
                 this.bgColor = 'grey';
+                this.dragging = false;
+                this.turnOnDragg = null;
+                this.turnOffDragg = null;
+                this.performDragg = null;
                 this.widgets = {
                 };
                 this.mouseOverEv = new GrabArt.Core.EntireEvent();
                 this.mouseMoveEv = new GrabArt.Core.EntireEvent();
+                this.mouseDownEv = new GrabArt.Core.EntireEvent();
+                this.mouseUpEv = new GrabArt.Core.EntireEvent();
                 this.MouseOver = this.mouseOverEv;
                 this.MouseMove = this.mouseMoveEv;
+                this.MouseDown = this.mouseDownEv;
+                this.MouseUp = this.mouseUpEv;
                 this.init();
             }
             Widget.prototype.draw = function () {
@@ -77,14 +102,15 @@ var GrabArt;
                     this.domId = '' + this.getName() + new Date().getTime().toString();
                     this.domElement = $('<div></div>');
                     this.bindEvents(this.domElement);
+                    this.domElement.attr('id', this.domId);
                 }
-                this.domElement.attr('id', this.domId).css({
+                this.domElement.css({
                     left: this.position.x + this.unit,
                     top: this.position.y + this.unit,
                     width: this.sizes.w + this.unit,
                     height: this.sizes.h + this.unit,
                     backgroundColor: this.bgColor,
-                    position: this.position.relative || 'static'
+                    position: this.position.relative || 'relative'
                 });
                 return this.domElement;
             };
@@ -94,6 +120,17 @@ var GrabArt;
                     return _this.mouseOverEv.fire(_this, event);
                 }).on('mousemove', function (event) {
                     return _this.mouseMoveEv.fire(_this, event);
+                }).on('mousedown', function (event) {
+                    return _this.mouseDownEv.fire(_this, event);
+                }).on('mouseup', function (event) {
+                    return _this.mouseUpEv.fire(_this, event);
+                });
+            };
+            Widget.prototype.move = function (dx, dy) {
+                var currentPosition = this.getPosition();
+                this.setPosition({
+                    x: currentPosition.x + dx,
+                    y: currentPosition.y + dy
                 });
             };
             Widget.prototype.addWidget = function (widget) {
@@ -107,7 +144,9 @@ var GrabArt;
                 if(position === null) {
                     throw "position is null";
                 }
-                this.position = position;
+                this.position.x = position.x;
+                this.position.y = position.y;
+                this.position.relative = position.relative || this.position.relative || 'static';
                 return this;
             };
             Widget.prototype.getPosition = function () {
@@ -122,6 +161,45 @@ var GrabArt;
             };
             Widget.prototype.getSizes = function () {
                 return this.sizes;
+            };
+            Widget.prototype.enableDragging = function () {
+                var _this = this;
+                if(this.turnOnDragg === null) {
+                    this.performDragg = function (sender, args) {
+                        if(_this.dragging) {
+                            _this.move(args.clientX - _this.previosX, args.clientY - _this.previosY);
+                            _this.drawSelf();
+                            _this.previosX = args.clientX;
+                            _this.previosY = args.clientY;
+                        }
+                    };
+                    this.turnOnDragg = function (_1, args) {
+                        _this.dragging = true;
+                        _this.previosX = args.clientX;
+                        _this.previosY = args.clientY;
+                    };
+                    this.turnOffDragg = function (_1, _2) {
+                        return _this.dragging = false;
+                    };
+                    this.MouseDown.addListener(this.turnOnDragg);
+                    this.MouseUp.addListener(this.turnOffDragg);
+                    this.MouseMove.addListener(this.performDragg);
+                }
+                return this;
+            };
+            Widget.prototype.disableDragging = function () {
+                if(this.turnOnDragg !== null) {
+                    this.MouseDown.removeListener(this.turnOnDragg);
+                    this.MouseUp.removeListener(this.turnOffDragg);
+                    this.MouseMove.removeListener(this.performDragg);
+                    this.turnOnDragg = null;
+                    this.turnOffDragg = null;
+                    this.performDragg = null;
+                }
+                return this;
+            };
+            Widget.prototype.changeDragging = function (dragging) {
+                this.dragging = dragging;
             };
             Widget.prototype.getUnit = function () {
                 return this.unit;
@@ -176,11 +254,8 @@ var GrabArt;
             this.page = page;
         }
         Application.prototype.run = function () {
-            var mainWindow = new GrabArt.GApp.UI.MainWidget('main');
-            mainWindow.addWidget(new GrabArt.UI.Widget('test').setBackgroundColor('red'));
-            mainWindow.MouseMove.addListener(function (sender, args) {
-                console.log(args);
-            });
+            var mainWindow = new GrabArt.GApp.UI.MainWidget('main'), test = new GrabArt.UI.Widget('test').setBackgroundColor('red').enableDragging();
+            mainWindow.addWidget(test);
             $(this.page).append(mainWindow.draw());
         };
         return Application;
@@ -305,6 +380,17 @@ var GrabArt;
                     event.addListener(testCallback);
                     entireEvent.fire({
                     }, '');
+                    this.assertEquals(1, callsNum);
+                };
+                EventsTest.prototype.testAddAndDeleteCallbackFromEvent = function () {
+                    var entireEvent = new GrabArt.Core.EntireEvent(), event = entireEvent, callsNum = 0, testCallback = function (sender, args) {
+                        callsNum += 1;
+                    };
+                    event.addListener(testCallback);
+                    entireEvent.fire({
+                    }, '');
+                    this.assertEquals(1, callsNum);
+                    event.removeListener(testCallback);
                     this.assertEquals(1, callsNum);
                 };
                 return EventsTest;
