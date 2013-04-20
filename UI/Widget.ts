@@ -16,7 +16,8 @@ module GrabArt.UI {
         h : number;
     }
 
-    export /** abstract */ class Widget {
+    /** Base class for all widgets */
+    export class Widget {
 
         /** const */
         private defaultRelativePos = 'absolute';
@@ -60,7 +61,6 @@ module GrabArt.UI {
             this.MouseUp     = this.mouseUpEv;
             this.Click       = this.clickEv;
 
-            this.init();
         }
 
         draw() : any {
@@ -192,12 +192,13 @@ module GrabArt.UI {
             return this;
         }
 
+        getBackgroundColor() : string {
+            return this.bgColor;
+        }
+
         setCursorStyle(style : string) : Widget {
             this.cursorStyle = style;
             return this;
         }
-
-        /* abstract */
-        init() : void {}
     }
 }

@@ -1,4 +1,4 @@
-/// <reference path="../TestCase.ts" />
+/// <reference path="../TestCase.ts"     />
 /// <reference path="../../UI/Widget.ts" />
 
 module GrabArt.Tests.UI {

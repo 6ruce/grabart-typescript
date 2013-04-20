@@ -1,5 +1,6 @@
 /// <reference  path="GApp/UI/MainWidget.ts" />
 /// <reference  path="UI/Button.ts"          />
+/// <reference  path="Core/Console.ts"       />
 /// <reference_ path="jquery.d.ts"           />
 
 module GrabArt {
@@ -12,7 +13,6 @@ module GrabArt {
                 test       = new GrabArt.UI.Button('test');
 
             mainWindow.addWidget(test).enableDragging();
-            //mainWindow.enableDragging();
 
             $(this.page).append(mainWindow.draw());
         }
