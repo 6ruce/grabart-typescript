@@ -23,7 +23,8 @@ module GrabArt.UI {
             domElement.html(this.caption)
                       .attr('align', 'center')
                       .css('line-height', this.getSizes().h + this.unit__)
-                      .css('font-family', 'Verdana, Geneva, sans-serif');
+                      .css('font-family', 'Verdana, Geneva, sans-serif')
+                      .css('font-weight', 'bold');
 
             return domElement;
         }

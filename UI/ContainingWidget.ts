@@ -8,12 +8,17 @@ module GrabArt.UI {
 
         draw() : any {
             var domElem = super.draw();
-
             for (var widgetName in this.widgets) {
-                $(domElem).append(this.widgets[widgetName].draw());
+                domElem.append(this.widgets[widgetName].draw());
             }
-
             return domElem;
+        }
+
+        redraw() : void {
+            super.redraw();
+            for (var widgetName in this.widgets) {
+                this.widgets[widgetName].redraw();
+            }
         }
 
         addWidget(widget : Widget) : ContainingWidget {

@@ -34,7 +34,7 @@ module GrabArt.UI {
         domId__       : string    = null;
         domElement__  : any       = null;
 
-        private dragger     : GrabArt.UI.Services.Dragger   = null;
+        private dragger      : GrabArt.UI.Services.Dragger   = null;
 
         private mouseOverEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
         private mouseOutEv   : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
@@ -76,6 +76,9 @@ module GrabArt.UI {
         }
 
         redraw() : void {
+            if (this.domId__ === null) {
+                this.draw();
+            }
             this.refreshCss__();
         }
 

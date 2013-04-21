@@ -172,6 +172,9 @@ var GrabArt;
                 return this.domElement__;
             };
             Widget.prototype.redraw = function () {
+                if(this.domId__ === null) {
+                    this.draw();
+                }
                 this.refreshCss__();
             };
             Widget.prototype.createDomElement__ = function () {
@@ -291,9 +294,15 @@ var GrabArt;
             ContainingWidget.prototype.draw = function () {
                 var domElem = _super.prototype.draw.call(this);
                 for(var widgetName in this.widgets) {
-                    $(domElem).append(this.widgets[widgetName].draw());
+                    domElem.append(this.widgets[widgetName].draw());
                 }
                 return domElem;
+            };
+            ContainingWidget.prototype.redraw = function () {
+                _super.prototype.redraw.call(this);
+                for(var widgetName in this.widgets) {
+                    this.widgets[widgetName].redraw();
+                }
             };
             ContainingWidget.prototype.addWidget = function (widget) {
                 this.widgets[widget.getName()] = widget;
@@ -348,7 +357,7 @@ var GrabArt;
             }
             Button.prototype.draw = function () {
                 var domElement = _super.prototype.draw.call(this);
-                domElement.html(this.caption).attr('align', 'center').css('line-height', this.getSizes().h + this.unit__).css('font-family', 'Verdana, Geneva, sans-serif');
+                domElement.html(this.caption).attr('align', 'center').css('line-height', this.getSizes().h + this.unit__).css('font-family', 'Verdana, Geneva, sans-serif').css('font-weight', 'bold');
                 return domElement;
             };
             Button.prototype.setCaption = function (caption) {
@@ -409,7 +418,7 @@ var GrabArt;
             }
             ToggleButton.prototype.onMouseDownGetCallback__ = function () {
                 var _this = this;
-                return function (sender, ags) {
+                return function (sender, args) {
                     if(_this.pressed) {
                         _this.setBackgroundColor(_this.previousColor__ != '' ? _this.previousColor__ : _this.basicColor__);
                         _this.redraw();
@@ -422,12 +431,12 @@ var GrabArt;
                 };
             };
             ToggleButton.prototype.onMouseUpGetCallback__ = function () {
-                return function (sender, ags) {
+                return function (sender, args) {
                 };
             };
             ToggleButton.prototype.onMouseOverGetCallback__ = function () {
                 var _this = this;
-                return function (sender, ags) {
+                return function (sender, args) {
                     if(!_this.pressed) {
                         _this.reactToMouseEvent__(_this.hoverColor__);
                     }
@@ -435,7 +444,7 @@ var GrabArt;
             };
             ToggleButton.prototype.onMouseLeaveGetCallback__ = function () {
                 var _this = this;
-                return function (sender, ags) {
+                return function (sender, args) {
                     if(!_this.pressed) {
                         _this.reactToMouseEvent__(_this.basicColor__);
                     }
@@ -500,12 +509,43 @@ var GrabArt;
 var GrabArt;
 (function (GrabArt) {
     (function (UI) {
+        var CanvasWidget = (function (_super) {
+            __extends(CanvasWidget, _super);
+            function CanvasWidget() {
+                _super.apply(this, arguments);
+
+            }
+            CanvasWidget.prototype.draw = function () {
+                var domElement = _super.prototype.draw.call(this);
+                this.refreshCanvasSizes(domElement);
+                return domElement;
+            };
+            CanvasWidget.prototype.redraw = function () {
+                _super.prototype.redraw.call(this);
+                this.refreshCanvasSizes(this.domElement__);
+            };
+            CanvasWidget.prototype.refreshCanvasSizes = function (domElement) {
+                domElement.attr('width', this.getSizes().w).attr('height', this.getSizes().h);
+            };
+            CanvasWidget.prototype.createDomElement__ = function () {
+                return $('<canvas></canvas>');
+            };
+            return CanvasWidget;
+        })(UI.Widget);
+        UI.CanvasWidget = CanvasWidget;        
+    })(GrabArt.UI || (GrabArt.UI = {}));
+    var UI = GrabArt.UI;
+})(GrabArt || (GrabArt = {}));
+var GrabArt;
+(function (GrabArt) {
+    (function (UI) {
         var ProgressBar = (function (_super) {
             __extends(ProgressBar, _super);
             function ProgressBar(name) {
                         _super.call(this, name);
-                this.progress = 50;
+                this.progress = 70;
                 this.barColor = 'red';
+                this.fontColor = 'white';
                 this.setSizes({
                     w: 100,
                     h: 20
@@ -513,33 +553,36 @@ var GrabArt;
             }
             ProgressBar.prototype.draw = function () {
                 var domElement = _super.prototype.draw.call(this);
-                this.refreshCanvasSizes(domElement);
                 this.refreshProgress(domElement);
                 return domElement;
             };
             ProgressBar.prototype.redraw = function () {
                 _super.prototype.redraw.call(this);
-                this.refreshCanvasSizes(this.domElement__);
                 this.refreshProgress(this.domElement__);
             };
-            ProgressBar.prototype.refreshCanvasSizes = function (domElement) {
-                domElement.attr('width', this.getSizes().w).attr('height', this.getSizes().h);
+            ProgressBar.prototype.setProgress = function (progress) {
+                if(progress < 0) {
+                    this.progress = 0;
+                } else if(progress > 100) {
+                    this.progress = 100;
+                } else {
+                    this.progress = progress;
+                }
             };
             ProgressBar.prototype.refreshProgress = function (canvasElement) {
                 if(!canvasElement[0].getContext) {
                     throw 'Cant get canvas context';
                 }
-                var context = canvasElement[0].getContext('2d');
+                var textProgress = this.progress + '%', context = canvasElement[0].getContext('2d');
                 context.fillStyle = this.getBackgroundColor();
                 context.fillRect(0, 0, 100, 100);
                 context.fillStyle = this.barColor;
                 context.fillRect(0, 0, this.getSizes().w / 100 * this.progress, this.getSizes().h);
-            };
-            ProgressBar.prototype.createDomElement__ = function () {
-                return $('<canvas></canvas>');
+                context.fillStyle = this.fontColor;
+                context.fillText(textProgress, (this.getSizes().w - context.measureText(textProgress).width) / 2, (this.getSizes().h - this.domElement__.css('font-size')) / 2);
             };
             return ProgressBar;
-        })(UI.Widget);
+        })(UI.CanvasWidget);
         UI.ProgressBar = ProgressBar;        
     })(GrabArt.UI || (GrabArt.UI = {}));
     var UI = GrabArt.UI;
@@ -570,6 +613,80 @@ var GrabArt;
 })(GrabArt || (GrabArt = {}));
 var GrabArt;
 (function (GrabArt) {
+    (function (GApp) {
+        (function (UI) {
+            var Grid = (function (_super) {
+                __extends(Grid, _super);
+                function Grid(nw, nh) {
+                                _super.call(this, 'grid');
+                    this.nw = nw;
+                    this.nh = nh;
+                    this.separatorSize = 1;
+                    this.activeColor = 'red';
+                    this.regularColor = 'yellow';
+                    this.cellsMap = [];
+                    this.setPosition({
+                        x: 10,
+                        y: 90
+                    }).setSizes({
+                        w: 280,
+                        h: 100
+                    });
+                }
+                Grid.prototype.draw = function () {
+                    var domElement = _super.prototype.draw.call(this);
+                    this.buildGrid(domElement);
+                    return domElement;
+                };
+                Grid.prototype.buildGrid = function (domElement) {
+                    var heightOffset = 0, widthOffset = 0, context = domElement[0].getContext('2d'), heightBlocks = this.getGridDimensions().nh, widthBlocks = this.getGridDimensions().nw, cellWidth = Math.round((this.getSizes().w - (widthBlocks - 1) * this.separatorSize) / widthBlocks), cellHeight = Math.round((this.getSizes().h - (heightBlocks - 1) * this.separatorSize) / heightBlocks);
+                    cellWidth = (cellWidth < 2) ? 2 : cellWidth;
+                    cellHeight = (cellHeight < 2) ? 2 : cellHeight;
+                    for(var i = 0; i < heightBlocks; i++) {
+                        widthOffset = 0;
+                        this.cellsMap[i] = this.cellsMap[i] || [];
+                        for(var j = 0; j < widthBlocks; j++) {
+                            context.fillStyle = (this.cellsMap[i][j]) ? this.activeColor : this.regularColor;
+                            context.fillRect(widthOffset, heightOffset, cellWidth, cellHeight);
+                            widthOffset += cellWidth + this.separatorSize;
+                        }
+                        heightOffset += cellHeight + this.separatorSize;
+                    }
+                };
+                Grid.prototype.rebuildGrid = function () {
+                    this.buildGrid(this.domElement__);
+                };
+                Grid.prototype.activateCell = function (x, y) {
+                    if(x < 0 || x > this.getGridDimensions().nw) {
+                        throw "x parameter out of bounds";
+                    }
+                    if(y < 0 || y > this.getGridDimensions().nh) {
+                        throw "y parameter out of bounds";
+                    }
+                    this.cellsMap[x] = this.cellsMap[x] || [];
+                    this.cellsMap[x][y] = true;
+                };
+                Grid.prototype.setGridDimensions = function (nw, nh) {
+                    this.nw = (nw <= 0) ? 1 : nw;
+                    this.nh = (nh <= 0) ? 1 : nh;
+                    return this;
+                };
+                Grid.prototype.getGridDimensions = function () {
+                    return {
+                        nw: this.nw,
+                        nh: this.nh
+                    };
+                };
+                return Grid;
+            })(GrabArt.UI.CanvasWidget);
+            UI.Grid = Grid;            
+        })(GApp.UI || (GApp.UI = {}));
+        var UI = GApp.UI;
+    })(GrabArt.GApp || (GrabArt.GApp = {}));
+    var GApp = GrabArt.GApp;
+})(GrabArt || (GrabArt = {}));
+var GrabArt;
+(function (GrabArt) {
     (function (Core) {
         var Console = (function () {
             function Console() { }
@@ -592,9 +709,11 @@ var GrabArt;
             this.startButton = new GrabArt.GApp.UI.StartButton();
             this.copyButton = new GrabArt.GApp.UI.CopyButton();
             this.progressBar = new GrabArt.GApp.UI.GrabProgress();
+            this.grid = new GrabArt.GApp.UI.Grid(20, 10);
         }
         Application.prototype.main = function () {
-            this.mainWindow.addWidget(this.startButton).addWidget(this.copyButton).addWidget(this.progressBar);
+            this.mainWindow.addWidget(this.startButton).addWidget(this.copyButton).addWidget(this.progressBar).addWidget(this.grid);
+            this.grid.activateCell(2, 2);
             this.mainWindow.enableDragging();
             $(this.page).append(this.mainWindow.draw());
         };

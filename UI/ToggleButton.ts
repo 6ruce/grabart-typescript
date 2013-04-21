@@ -6,7 +6,7 @@ module GrabArt.UI {
 
         /** protected */
         onMouseDownGetCallback__() : (sender : Object, args : any) => void {
-            return (sender, ags) => {
+            return (sender, args) => {
                 if (this.pressed) {
                     this.setBackgroundColor(
                         this.previousColor__ != '' ? this.previousColor__ : this.basicColor__
@@ -23,12 +23,12 @@ module GrabArt.UI {
 
         /** protected */
         onMouseUpGetCallback__() : (sender : Object, args : any) => void {
-            return (sender, ags) => {/** nothing */ };
+            return (sender, args) => {};
         }
 
         /** protected */
         onMouseOverGetCallback__() : (sender : Object, args : any) => void {
-            return (sender, ags) => {
+            return (sender, args) => {
                 if (! this.pressed) {
                     this.reactToMouseEvent__(this.hoverColor__);
                 }
@@ -37,7 +37,7 @@ module GrabArt.UI {
 
         /** protected */
         onMouseLeaveGetCallback__() : (sender : Object, args : any) => void {
-            return (sender, ags) => {
+            return (sender, args) => {
                 if (! this.pressed) {
                     this.reactToMouseEvent__(this.basicColor__);
                 }

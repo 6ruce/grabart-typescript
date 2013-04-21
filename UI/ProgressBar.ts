@@ -1,10 +1,11 @@
-/// <reference path="Widget.ts" />
+/// <reference path="CanvasWidget.ts" />
 
 module GrabArt.UI {
     declare var $;
-    export class ProgressBar extends Widget {
-        private progress : number = 50;
-        private barColor : string = 'red';
+    export class ProgressBar extends CanvasWidget {
+        private progress  : number = 70;
+        private barColor  : string = 'red';
+        private fontColor : string = 'white';
 
         constructor(name : string) {
             super(name);
@@ -13,36 +14,37 @@ module GrabArt.UI {
 
         draw() : any {
             var domElement = super.draw();
-            this.refreshCanvasSizes(domElement);
             this.refreshProgress(domElement);
             return domElement;
         }
 
         redraw() : void {
             super.redraw();
-            this.refreshCanvasSizes(this.domElement__);
             this.refreshProgress(this.domElement__);
         }
 
-        private refreshCanvasSizes(domElement) : void {
-            domElement.attr('width'  , this.getSizes().w)
-                      .attr('height' , this.getSizes().h);
+        setProgress(progress : number) : void {
+            if      (progress < 0  ) this.progress = 0;
+            else if (progress > 100) this.progress = 100;
+            else                     this.progress = progress;
         }
 
         private refreshProgress(canvasElement) : void {
             if (! canvasElement[0].getContext)
                 throw 'Cant get canvas context';
 
-            var context = canvasElement[0].getContext('2d');
+            var textProgress = this.progress + '%',
+                context      = canvasElement[0].getContext('2d');
             context.fillStyle = this.getBackgroundColor();
             context.fillRect(0, 0, 100, 100);
             context.fillStyle = this.barColor;
             context.fillRect(0, 0, this.getSizes().w / 100 * this.progress, this.getSizes().h);
-        }
-
-        /** protected */
-        createDomElement__() : any {
-            return $('<canvas></canvas>');
+            context.fillStyle = this.fontColor;
+            context.fillText(
+                textProgress,
+                (this.getSizes().w - context.measureText(textProgress).width) / 2,
+                (this.getSizes().h - this.domElement__.css('font-size')) / 2
+            );
         }
     }
 }
