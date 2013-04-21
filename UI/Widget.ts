@@ -22,18 +22,19 @@ module GrabArt.UI {
         /** const */
         private defaultRelativePos = 'absolute';
 
-        private position    : IPosition = { x : 0,   y : 0, relative : 'absolute' };
-        private sizes       : ISizes    = { w : 100, h : 75 };
-        private unit        : string    = 'px';
-        private visible     : bool      = true;
-        private domId       : string    = null;
-        private domElement  : any       = null;
-        private bgColor     : string    = 'grey';
-        private cursorStyle : string    = 'default';
+        private position      : IPosition = { x : 0,   y : 0, relative : 'absolute' };
+        private sizes         : ISizes    = { w : 100, h : 75 };
+
+        private visible       : bool      = true;
+        private bgColor       : string    = 'grey';
+        private cursorStyle   : string    = 'default';
+
+        /** protected */
+        unit__        : string    = 'px';
+        domId__       : string    = null;
+        domElement__  : any       = null;
 
         private dragger     : GrabArt.UI.Services.Dragger   = null;
-
-        private widgets     : { [name : string] : Widget; } = {};
 
         private mouseOverEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
         private mouseOutEv   : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
@@ -60,46 +61,47 @@ module GrabArt.UI {
             this.MouseDown   = this.mouseDownEv;
             this.MouseUp     = this.mouseUpEv;
             this.Click       = this.clickEv;
-
         }
 
         draw() : any {
-            var domElem = this.drawSelf();
-
-            for (var widgetName in this.widgets) {
-                $(domElem).append(this.widgets[widgetName].draw());
+            if (this.domId__ === null) {
+                this.domId__      = '' + this.getName() + new Date().getTime().toString();
+                this.domElement__ = this.createDomElement__();
+                this.bindEvents__(this.domElement__);
+                this.domElement__.attr('id', this.domId__)
             }
+            this.refreshCss__();
 
-            return domElem;
-        }
-
-        drawSelf() : any {
-            if (this.domId === null) {
-                this.domId      = '' + this.getName() + new Date().getTime().toString();
-                this.domElement = $('<div></div>');
-                this.bindEvents(this.domElement);
-                this.domElement.attr('id', this.domId)
-            }
-
-            this.domElement
-                .css({
-                      left            : this.position.x + this.unit
-                    , top             : this.position.y + this.unit
-                    , width           : this.sizes.w    + this.unit
-                    , height          : this.sizes.h    + this.unit
-                    , backgroundColor : this.bgColor
-                    , position        : this.position.relative || this.defaultRelativePos
-                    , cursor          : this.cursorStyle
-                });
-
-            return this.domElement;
+            return this.domElement__;
         }
 
         redraw() : void {
-            this.drawSelf();
+            this.refreshCss__();
         }
 
-        private bindEvents(domElement : Object) : void {
+        /** protected */
+        createDomElement__() : any {
+            return $('<div></div>');
+        }
+
+        /** protected */
+        refreshCss__() : void {
+            if (this.domId__ !== null) {
+                this.domElement__
+                    .css({
+                          left            : this.position.x + this.unit__
+                        , top             : this.position.y + this.unit__
+                        , width           : this.sizes.w    + this.unit__
+                        , height          : this.sizes.h    + this.unit__
+                        , backgroundColor : this.bgColor
+                        , position        : this.position.relative || this.defaultRelativePos
+                        , cursor          : this.cursorStyle
+                    });
+            }
+        }
+
+        /** protected */
+        bindEvents__(domElement : Object) : void {
             $(domElement).on('mouseover'  , (event) => this.mouseOverEv.fire(this, event))
                          .on('mouseout'   , (event) => this.mouseOutEv.fire(this, event))
                          .on('mouseleave' , (event) => this.mouseLeaveEv.fire(this, event))
@@ -114,11 +116,6 @@ module GrabArt.UI {
                 x : currentPosition.x + dx,
                 y : currentPosition.y + dy
             });
-        }
-
-        addWidget(widget : Widget) : Widget {
-            this.widgets[widget.getName()] = widget;
-            return this;
         }
 
         getName() { return this.name; }
@@ -179,7 +176,7 @@ module GrabArt.UI {
         }
 
         getUnit() : string {
-            return this.unit;
+            return this.unit__;
         }
 
         setBackgroundColor(color : string) : Widget {

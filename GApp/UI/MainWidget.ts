@@ -1,11 +1,11 @@
-/// <reference path="../../UI/Widget.ts" />
+/// <reference path="../../UI/ContainingWidget.ts" />
 
 module GrabArt.GApp.UI {
-    export class MainWidget extends GrabArt.UI.Widget {
-        constructor(name : string) {
-            super(name);
+    export class MainWidget extends GrabArt.UI.ContainingWidget {
+        constructor() {
+            super('main');
             this.setPosition({ x : 600, y : 100, relative : 'fixed' })
-                .setSizes({ w : 200, h : 100 });
+                .setSizes({ w : 300, h : 200 });
         }
     }
 }

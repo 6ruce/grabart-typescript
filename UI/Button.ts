@@ -1,38 +1,81 @@
-/// <reference path="Widget.ts" />
+/// <reference path="ContainingWidget.ts"/>
 
 module GrabArt.UI {
     export class Button extends Widget {
-
-        private basicColor    : string = 'aqua';
-        private hoverColor    : string = 'blue';
-        private pressedColor  : string = 'darkblue';
-        private previousColor : string = '';
+        private caption       : string = '';
+        
+        /** protected */
+        basicColor__    : string = 'aqua';
+        pressedColor__  : string = 'darkblue';
+        hoverColor__    : string = 'blue';
+        previousColor__ : string = '';
+        
 
         constructor(name : string) {
             super(name);
-            this.setBackgroundColor(this.basicColor);
+            this.setCaption(name);
+            this.setBackgroundColor(this.basicColor__);
             this.initInteractionEvents();
         }
 
-        private initInteractionEvents() : void {
-            var getChangeColorCallback = (color : string) => (_1, _2) => {
-                this.previousColor = this.getBackgroundColor();
-                this.setBackgroundColor(color);
-                this.redraw();
+        draw() : any {
+            var domElement = super.draw();
+            domElement.html(this.caption)
+                      .attr('align', 'center')
+                      .css('line-height', this.getSizes().h + this.unit__)
+                      .css('font-family', 'Verdana, Geneva, sans-serif');
+
+            return domElement;
+        }
+
+        setCaption(caption : string) : Button {
+            this.caption = caption;
+            return this;
+        }
+
+        /** protected */
+        onMouseDownGetCallback__() : (sender : Object, args : any) => void {
+            return (sender, args) => {
+                this.reactToMouseEvent__(this.pressedColor__);
             };
-            var getBackColorCallback = (color : string) => (_1, _2) => {
+        }
+
+        /** protected */
+        onMouseUpGetCallback__() : (sender : Object, args : any) => void {
+            return (sender, args) => {
                 this.setBackgroundColor(
-                    this.previousColor != '' ? this.previousColor : color
+                    this.previousColor__ != '' ? this.previousColor__ : this.basicColor__
                 );
                 this.redraw();
             };
+        }
 
-            this.MouseOver.addListener(getChangeColorCallback(this.hoverColor));
-            this.MouseDown.addListener(getChangeColorCallback(this.pressedColor));
-            this.MouseLeave.addListener(getChangeColorCallback(this.basicColor));
+        /** protected */
+        onMouseOverGetCallback__() : (sender : Object, args : any) => void {
+            return (sender, args) => {
+                this.reactToMouseEvent__(this.hoverColor__);
+            };
+        }
 
-            this.MouseUp.addListener(getBackColorCallback(this.basicColor));
+        /** protected */
+        onMouseLeaveGetCallback__() : (sender : Object, args : any) => void {
+            return (sender, args) => {
+                this.reactToMouseEvent__(this.basicColor__);
+            };
+        }
 
+        /** protected */
+        reactToMouseEvent__(color : string) : void {
+            this.previousColor__ = this.getBackgroundColor();
+            this.setBackgroundColor(color);
+            this.redraw();
+        }
+
+        private initInteractionEvents() : void {
+            this.MouseOver.addListener(this.onMouseOverGetCallback__());
+            this.MouseLeave.addListener(this.onMouseLeaveGetCallback__());
+            this.MouseDown.addListener(this.onMouseDownGetCallback__());
+            this.MouseUp.addListener(this.onMouseUpGetCallback__());
         }
     }
 }

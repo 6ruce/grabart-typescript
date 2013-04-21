@@ -9,7 +9,7 @@ module GrabArt.Tests.UI {
 
         testNewWidgetCreationWithoutParams() : void {
             var   testWidget = new GrabArt.UI.Widget('test')
-                , domElem    = testWidget.drawSelf()[0]
+                , domElem    = testWidget.draw()[0]
                 , unit       = testWidget.getUnit();
 
             this.assertEquals('absolute'   , domElem.style.position);
@@ -22,7 +22,7 @@ module GrabArt.Tests.UI {
         testNewWidgetCreationWithCustomSizes() : void {
             var   testWidget = new GrabArt.UI.Widget('test')
                                   .setSizes({ w : 200, h : 200})
-                , domElem    = testWidget.drawSelf()[0]
+                , domElem    = testWidget.draw()[0]
                 , unit       = testWidget.getUnit();
 
             this.assertEquals(200 + unit , domElem.style.width  );

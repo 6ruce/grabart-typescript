@@ -1,7 +1,6 @@
 /// <reference path="../Core/Console.ts" />
 
 /// <reference path="TestCase.ts" />
-/// <reference path="SampleTest.ts" />
 /// <reference path="UI/WidgetTest.ts" />
 /// <reference path="UI/Services/DraggerTest.ts" />
 /// <reference path="Core/EventsTest.ts" />
