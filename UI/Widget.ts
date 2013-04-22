@@ -64,13 +64,13 @@ module GrabArt.UI {
         }
 
         draw() : any {
-            if (this.domId__ === null) {
+            if (this.domElement__ === null) {
                 this.domId__      = '' + this.getName() + new Date().getTime().toString();
                 this.domElement__ = this.createDomElement__();
                 this.bindEvents__(this.domElement__);
                 this.domElement__.attr('id', this.domId__)
             }
-            this.refreshCss__();
+            this.refreshCss__(this.domElement__);
 
             return this.domElement__;
         }
@@ -79,7 +79,7 @@ module GrabArt.UI {
             if (this.domId__ === null) {
                 this.draw();
             }
-            this.refreshCss__();
+            this.refreshCss__(this.domElement__);
         }
 
         /** protected */
@@ -88,19 +88,16 @@ module GrabArt.UI {
         }
 
         /** protected */
-        refreshCss__() : void {
-            if (this.domId__ !== null) {
-                this.domElement__
-                    .css({
-                          left            : this.position.x + this.unit__
-                        , top             : this.position.y + this.unit__
-                        , width           : this.sizes.w    + this.unit__
-                        , height          : this.sizes.h    + this.unit__
-                        , backgroundColor : this.bgColor
-                        , position        : this.position.relative || this.defaultRelativePos
-                        , cursor          : this.cursorStyle
-                    });
-            }
+        refreshCss__(domElement) : void {
+            domElement.css({
+                  left            : this.position.x + this.unit__
+                , top             : this.position.y + this.unit__
+                , width           : this.sizes.w    + this.unit__
+                , height          : this.sizes.h    + this.unit__
+                , backgroundColor : this.bgColor
+                , position        : this.position.relative || this.defaultRelativePos
+                , cursor          : this.cursorStyle
+            });
         }
 
         /** protected */
@@ -110,7 +107,8 @@ module GrabArt.UI {
                          .on('mouseleave' , (event) => this.mouseLeaveEv.fire(this, event))
                          .on('mousemove'  , (event) => this.mouseMoveEv.fire(this, event))
                          .on('mousedown'  , (event) => this.mouseDownEv.fire(this, event))
-                         .on('mouseup'    , (event) => this.mouseUpEv.fire(this, event));
+                         .on('mouseup'    , (event) => this.mouseUpEv.fire(this, event))
+                         .on('click'      , (event) => this.clickEv.fire(this, event));
         }
 
         move(dx : number, dy : number) : void {
@@ -146,6 +144,12 @@ module GrabArt.UI {
 
             this.sizes = sizes;
 
+            return this;
+        }
+
+        resize(dw : number, dh : number) : Widget {
+            this.sizes.w += dw;
+            this.sizes.h += dh;
             return this;
         }
 

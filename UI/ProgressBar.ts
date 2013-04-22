@@ -3,7 +3,7 @@
 module GrabArt.UI {
     declare var $;
     export class ProgressBar extends CanvasWidget {
-        private progress  : number = 70;
+        private progress  : number = 100;
         private barColor  : string = 'red';
         private fontColor : string = 'white';
 
@@ -35,15 +35,17 @@ module GrabArt.UI {
 
             var textProgress = this.progress + '%',
                 context      = canvasElement[0].getContext('2d');
+
             context.fillStyle = this.getBackgroundColor();
-            context.fillRect(0, 0, 100, 100);
+            context.fillRect(0, 0, this.getSizes().w, this.getSizes().h);
             context.fillStyle = this.barColor;
             context.fillRect(0, 0, this.getSizes().w / 100 * this.progress, this.getSizes().h);
             context.fillStyle = this.fontColor;
+            context.font = 'italic 16px Calibri';
             context.fillText(
                 textProgress,
                 (this.getSizes().w - context.measureText(textProgress).width) / 2,
-                (this.getSizes().h - this.domElement__.css('font-size')) / 2
+                (this.getSizes().h) / 2
             );
         }
     }

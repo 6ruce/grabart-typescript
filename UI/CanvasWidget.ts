@@ -5,16 +5,17 @@ module GrabArt.UI {
     export class CanvasWidget extends Widget {
         draw() : any {
             var domElement = super.draw();
-            this.refreshCanvasSizes(domElement);
+            this.refreshCanvasSizes__(domElement);
             return domElement;
         }
 
         redraw() : void {
             super.redraw();
-            this.refreshCanvasSizes(this.domElement__);
+            this.refreshCanvasSizes__(this.domElement__);
         }
 
-        private refreshCanvasSizes(domElement) : void {
+        /** protected */
+        refreshCanvasSizes__(domElement) : void {
             domElement.attr('width'  , this.getSizes().w)
                       .attr('height' , this.getSizes().h);
         }
