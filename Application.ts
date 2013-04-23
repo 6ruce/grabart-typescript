@@ -13,7 +13,7 @@ module GrabArt {
         private startButton = new GrabArt.GApp.UI.StartButton();
         private copyButton  = new GrabArt.GApp.UI.CopyButton();
         private progressBar = new GrabArt.GApp.UI.GrabProgress();
-        private grid        = new GrabArt.GApp.UI.Grid(100, 100);
+        private grid        = new GrabArt.GApp.UI.Grid(10, 10);
 
         constructor(private page){}
 
@@ -33,13 +33,15 @@ module GrabArt {
         grid_Resize_GetCallback() : (sender : Object, args : any) => void {
             return (sender, args) => {
                 this.mainWindow.resize(args.dw, args.dh);
+                this.copyButton.resize(args.dw, 0);
+                this.progressBar.resize(args.dw, 0);
                 this.mainWindow.redraw();
             };
         }
 
         startButton_Click_GetCallback() : (sender : Object, args : any) => void {
             return (sender, args) => {
-                GrabArt.Core.Console.writeLine('start button click');
+                this.grid.setGridDimensions(200, 100).redraw();
             };
         }
 

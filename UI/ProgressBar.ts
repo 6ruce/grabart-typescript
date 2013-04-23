@@ -45,7 +45,7 @@ module GrabArt.UI {
             context.fillText(
                 textProgress,
                 (this.getSizes().w - context.measureText(textProgress).width) / 2,
-                (this.getSizes().h) / 2
+                (this.getSizes().h / 2 + 4)
             );
         }
     }

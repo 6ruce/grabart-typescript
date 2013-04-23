@@ -585,7 +585,7 @@ var GrabArt;
                 context.fillRect(0, 0, this.getSizes().w / 100 * this.progress, this.getSizes().h);
                 context.fillStyle = this.fontColor;
                 context.font = 'italic 16px Calibri';
-                context.fillText(textProgress, (this.getSizes().w - context.measureText(textProgress).width) / 2, (this.getSizes().h) / 2);
+                context.fillText(textProgress, (this.getSizes().w - context.measureText(textProgress).width) / 2, (this.getSizes().h / 2 + 4));
             };
             return ProgressBar;
         })(UI.CanvasWidget);
@@ -758,7 +758,7 @@ var GrabArt;
             this.startButton = new GrabArt.GApp.UI.StartButton();
             this.copyButton = new GrabArt.GApp.UI.CopyButton();
             this.progressBar = new GrabArt.GApp.UI.GrabProgress();
-            this.grid = new GrabArt.GApp.UI.Grid(100, 100);
+            this.grid = new GrabArt.GApp.UI.Grid(10, 10);
         }
         Application.prototype.main = function () {
             this.mainWindow.addWidget(this.startButton).addWidget(this.copyButton).addWidget(this.progressBar).addWidget(this.grid);
@@ -771,12 +771,15 @@ var GrabArt;
             var _this = this;
             return function (sender, args) {
                 _this.mainWindow.resize(args.dw, args.dh);
+                _this.copyButton.resize(args.dw, 0);
+                _this.progressBar.resize(args.dw, 0);
                 _this.mainWindow.redraw();
             };
         };
         Application.prototype.startButton_Click_GetCallback = function () {
+            var _this = this;
             return function (sender, args) {
-                GrabArt.Core.Console.writeLine('start button click');
+                _this.grid.setGridDimensions(200, 100).redraw();
             };
         };
         Application.prototype.wireEvents = function () {
