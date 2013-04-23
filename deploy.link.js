@@ -621,6 +621,11 @@ var GrabArt;
                     }
                 }
             };
+            ProgressBar.prototype.increase = function (amount) {
+                amount = amount >= 0 ? amount : 0;
+                this.progress = (amount + this.progress <= 100) ? amount + this.progress : 100;
+                return this;
+            };
             ProgressBar.prototype.refreshProgress = function (canvasElement) {
                 if(!canvasElement[0].getContext) {
                     throw 'Cant get canvas context';
@@ -873,10 +878,51 @@ var GrabArt;
 
 var GrabArt;
 (function (GrabArt) {
+    (function (UI) {
+        (function (Services) {
+            var Application = (function () {
+                function Application(page) {
+                    this.page = page;
+                    this.mainWidget = null;
+                }
+                Application.prototype.run = function () {
+                    try  {
+                        this.main();
+                        if(this.mainWidget !== null) {
+                            $(this.page).append(this.mainWidget.draw());
+                        }
+                    } catch (exc) {
+                        GrabArt.Core.Console.writeLine('Exception: ' + exc, 'red');
+                    }
+                };
+                Application.prototype.setMainWidget = function (widget) {
+                    if(widget == null) {
+                        throw 'widget is null';
+                    }
+                    this.mainWidget = widget;
+                    return this;
+                };
+                Application.prototype.main = function () {
+                };
+                return Application;
+            })();
+            Services.Application = Application;            
+        })(UI.Services || (UI.Services = {}));
+        var Services = UI.Services;
+
+    })(GrabArt.UI || (GrabArt.UI = {}));
+    var UI = GrabArt.UI;
+
+})(GrabArt || (GrabArt = {}));
+
+var GrabArt;
+(function (GrabArt) {
     (function (GApp) {
-        var Application = (function () {
-            function Application(page) {
-                this.page = page;
+        var Application = (function (_super) {
+            __extends(Application, _super);
+            function Application() {
+                _super.apply(this, arguments);
+
                 this.mainWindow = new GrabArt.GApp.UI.MainWidget();
                 this.startButton = new GrabArt.GApp.UI.StartButton();
                 this.copyButton = new GrabArt.GApp.UI.CopyButton();
@@ -888,7 +934,7 @@ var GrabArt;
                 this.grid.activateCell(2, 2);
                 this.mainWindow.enableDragging();
                 this.applyColorScheme().wireEvents();
-                $(this.page).append(this.mainWindow.draw());
+                this.setMainWidget(this.mainWindow);
             };
             Application.prototype.grid_Resize_GetCallback = function () {
                 var _this = this;
@@ -905,6 +951,12 @@ var GrabArt;
                     _this.grid.setGridDimensions(200, 100).redraw();
                 }
             };
+            Application.prototype.copyButton_Click_GetCallback = function () {
+                var _this = this;
+                return function (sender, args) {
+                    _this.progressBar.increase(10).redraw();
+                }
+            };
             Application.prototype.applyColorScheme = function () {
                 var colorScheme = GrabArt.GApp.Config.colorScheme;
                 this.mainWindow.setBackgroundColor(colorScheme.mainWindowColor);
@@ -917,17 +969,11 @@ var GrabArt;
             Application.prototype.wireEvents = function () {
                 this.grid.Resize.addListener(this.grid_Resize_GetCallback());
                 this.startButton.Click.addListener(this.startButton_Click_GetCallback());
+                this.copyButton.Click.addListener(this.copyButton_Click_GetCallback());
                 return this;
             };
-            Application.prototype.run = function () {
-                try  {
-                    this.main();
-                } catch (exc) {
-                    GrabArt.Core.Console.writeLine('Exception: ' + exc, 'red');
-                }
-            };
             return Application;
-        })();
+        })(GrabArt.UI.Services.Application);
         GApp.Application = Application;        
     })(GrabArt.GApp || (GrabArt.GApp = {}));
     var GApp = GrabArt.GApp;

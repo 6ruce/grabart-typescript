@@ -29,6 +29,12 @@ module GrabArt.UI {
             else                     this.progress = progress;
         }
 
+        increase(amount : number) : ProgressBar {
+            amount = amount >=0  ? amount : 0;
+            this.progress = (amount + this.progress <= 100) ? amount + this.progress : 100 ;
+            return this;
+        }
+
         private refreshProgress(canvasElement) : void {
             if (! canvasElement[0].getContext)
                 throw 'Cant get canvas context';
