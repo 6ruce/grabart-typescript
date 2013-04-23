@@ -1,4 +1,4 @@
-/// </reference path="Widget.ts" />
+/// <reference path="Widget.ts" />
 
 module GrabArt.UI {
     declare var $;
