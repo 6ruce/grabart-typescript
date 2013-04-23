@@ -48,5 +48,11 @@ module GrabArt.UI {
                 (this.getSizes().h / 2 + 4)
             );
         }
+
+        setBarColor(color : string) : ProgressBar {
+            if (color == '') throw "color is empty";
+            this.barColor = color;
+            return this;
+        }
     }
 }

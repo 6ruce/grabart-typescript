@@ -105,6 +105,18 @@ module GrabArt.GApp.UI {
             }
         }
 
+        setRegularColor(color : string) : Grid {
+            if (color == '') throw "color is empty";
+            this.regularColor = color;
+            return this;
+        }
+
+        setActiveColor(color : string) : Grid {
+            if (color == '') throw "color is empty";
+            this.activeColor = color;
+            return this;
+        }
+
         setGridDimensions(nw : number, nh : number) : Grid {
             this.nw = (nw <= 0) ? 1 : nw;
             this.nh = (nh <= 0) ? 1 : nh;

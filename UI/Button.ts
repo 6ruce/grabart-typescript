@@ -14,11 +14,11 @@ module GrabArt.UI {
         constructor(name : string) {
             super(name);
             this.setCaption(name);
-            this.setBackgroundColor(this.basicColor__);
             this.initInteractionEvents();
         }
 
         draw() : any {
+            this.setBackgroundColor(this.basicColor__);
             var domElement = super.draw();
             domElement.html(this.caption)
                       .attr('align', 'center')
@@ -70,6 +70,24 @@ module GrabArt.UI {
             this.previousColor__ = this.getBackgroundColor();
             this.setBackgroundColor(color);
             this.redraw();
+        }
+
+        setBasicColor(color : string) : Button {
+            if (color == '') throw "color is empty";
+            this.basicColor__ = color;
+            return this;
+        }
+
+        setPressedColor(color : string) : Button {
+            if (color == '') throw "color is empty";
+            this.pressedColor__ = color;
+            return this;
+        }
+
+        setHoverColor(color : string) : Button {
+            if (color == '') throw "color is empty";
+            this.hoverColor__ = color;
+            return this;
         }
 
         private initInteractionEvents() : void {

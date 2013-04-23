@@ -1,19 +1,20 @@
-/// <reference  path="GApp/UI/MainWidget.ts"    />
-/// <reference  path="GApp/UI/StartButton.ts"   />
-/// <reference  path="GApp/UI/CopyButton.ts"    />
-/// <reference  path="GApp/UI/GrabProgress.ts"  />
-/// <reference  path="GApp/UI/Grid.ts"          />
-/// <reference  path="Core/Console.ts"          />
-/// <reference_ path="jquery.d.ts"              />
+/// <reference  path="UI/MainWidget.ts"      />
+/// <reference  path="UI/StartButton.ts"     />
+/// <reference  path="UI/CopyButton.ts"      />
+/// <reference  path="UI/GrabProgress.ts"    />
+/// <reference  path="UI/Grid.ts"            />
+/// <reference  path="Config.ts"             />
+/// <reference  path="../Core/Console.ts"    />
+/// <reference_ path="../jquery.d.ts"        />
 
-module GrabArt {
+module GrabArt.GApp {
     declare var $;
     export class Application {
         private mainWindow  = new GrabArt.GApp.UI.MainWidget();
         private startButton = new GrabArt.GApp.UI.StartButton();
         private copyButton  = new GrabArt.GApp.UI.CopyButton();
         private progressBar = new GrabArt.GApp.UI.GrabProgress();
-        private grid        = new GrabArt.GApp.UI.Grid(10, 10);
+        private grid        = new GrabArt.GApp.UI.Grid(20, 10);
 
         constructor(private page){}
 
@@ -26,7 +27,8 @@ module GrabArt {
             this.grid.activateCell(2, 2);
             this.mainWindow.enableDragging();
 
-            this.wireEvents();
+
+            this.applyColorScheme().wireEvents();
             $(this.page).append(this.mainWindow.draw());
         }
 
@@ -45,9 +47,32 @@ module GrabArt {
             };
         }
 
-        wireEvents() : void {
+        private applyColorScheme() : Application {
+            var colorScheme = GrabArt.GApp.Config.colorScheme;
+            this.mainWindow.setBackgroundColor(colorScheme.mainWindowColor);
+
+            this.startButton.setBasicColor(colorScheme.startButton.basicColor)
+                            .setHoverColor(colorScheme.startButton.hoverColor)
+                            .setPressedColor(colorScheme.startButton.pressedColor);
+
+            this.copyButton.setBasicColor(colorScheme.startButton.basicColor)
+                           .setHoverColor(colorScheme.startButton.hoverColor)
+                           .setPressedColor(colorScheme.startButton.pressedColor)
+
+            this.progressBar.setBarColor(colorScheme.progressBar.barColor)
+                            .setBackgroundColor(colorScheme.progressBar.backColor);
+
+            this.grid.setActiveColor(colorScheme.grid.activeColor)
+                     .setRegularColor(colorScheme.grid.regularColor)
+                     .setBackgroundColor(colorScheme.mainWindowColor);
+
+            return this;
+        }
+
+        private wireEvents() : Application {
             this.grid.Resize.addListener(this.grid_Resize_GetCallback());
             this.startButton.Click.addListener(this.startButton_Click_GetCallback());
+            return this;
         }
 
         run () : void {

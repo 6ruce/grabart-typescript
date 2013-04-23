@@ -369,10 +369,10 @@ var GrabArt;
                 this.hoverColor__ = 'blue';
                 this.previousColor__ = '';
                 this.setCaption(name);
-                this.setBackgroundColor(this.basicColor__);
                 this.initInteractionEvents();
             }
             Button.prototype.draw = function () {
+                this.setBackgroundColor(this.basicColor__);
                 var domElement = _super.prototype.draw.call(this);
                 domElement.html(this.caption).attr('align', 'center').css('line-height', this.getSizes().h + this.unit__).css('font-family', 'Verdana, Geneva, sans-serif').css('font-weight', 'bold');
                 return domElement;
@@ -410,6 +410,27 @@ var GrabArt;
                 this.previousColor__ = this.getBackgroundColor();
                 this.setBackgroundColor(color);
                 this.redraw();
+            };
+            Button.prototype.setBasicColor = function (color) {
+                if(color == '') {
+                    throw "color is empty";
+                }
+                this.basicColor__ = color;
+                return this;
+            };
+            Button.prototype.setPressedColor = function (color) {
+                if(color == '') {
+                    throw "color is empty";
+                }
+                this.pressedColor__ = color;
+                return this;
+            };
+            Button.prototype.setHoverColor = function (color) {
+                if(color == '') {
+                    throw "color is empty";
+                }
+                this.hoverColor__ = color;
+                return this;
             };
             Button.prototype.initInteractionEvents = function () {
                 this.MouseOver.addListener(this.onMouseOverGetCallback__());
@@ -615,6 +636,13 @@ var GrabArt;
                 context.font = 'italic 16px Calibri';
                 context.fillText(textProgress, (this.getSizes().w - context.measureText(textProgress).width) / 2, (this.getSizes().h / 2 + 4));
             };
+            ProgressBar.prototype.setBarColor = function (color) {
+                if(color == '') {
+                    throw "color is empty";
+                }
+                this.barColor = color;
+                return this;
+            };
             return ProgressBar;
         })(UI.CanvasWidget);
         UI.ProgressBar = ProgressBar;        
@@ -638,6 +666,7 @@ var GrabArt;
                         w: 175,
                         h: 33
                     });
+                    this.setProgress(10);
                 }
                 return GrabProgress;
             })(GrabArt.UI.ProgressBar);
@@ -759,6 +788,20 @@ var GrabArt;
                         context.fillStyle = currentStyle;
                     }
                 };
+                Grid.prototype.setRegularColor = function (color) {
+                    if(color == '') {
+                        throw "color is empty";
+                    }
+                    this.regularColor = color;
+                    return this;
+                };
+                Grid.prototype.setActiveColor = function (color) {
+                    if(color == '') {
+                        throw "color is empty";
+                    }
+                    this.activeColor = color;
+                    return this;
+                };
                 Grid.prototype.setGridDimensions = function (nw, nh) {
                     this.nw = (nw <= 0) ? 1 : nw;
                     this.nh = (nh <= 0) ? 1 : nh;
@@ -783,6 +826,36 @@ var GrabArt;
 
 var GrabArt;
 (function (GrabArt) {
+    (function (GApp) {
+        var Config = (function () {
+            function Config() { }
+            Config.colorScheme = {
+                mainWindowColor: '#C7C5C1',
+                startButton: {
+                    basicColor: '#8F8C88',
+                    hoverColor: '#6B6967',
+                    pressedColor: '#5D482C'
+                },
+                progressBar: {
+                    barColor: '#646B44',
+                    backColor: '#828575'
+                },
+                grid: {
+                    regularColor: '#ACAAB0',
+                    activeColor: '#A2000C',
+                    backColor: '#484749'
+                }
+            };
+            return Config;
+        })();
+        GApp.Config = Config;        
+    })(GrabArt.GApp || (GrabArt.GApp = {}));
+    var GApp = GrabArt.GApp;
+
+})(GrabArt || (GrabArt = {}));
+
+var GrabArt;
+(function (GrabArt) {
     (function (Core) {
         var Console = (function () {
             function Console() { }
@@ -800,51 +873,65 @@ var GrabArt;
 
 var GrabArt;
 (function (GrabArt) {
-    var Application = (function () {
-        function Application(page) {
-            this.page = page;
-            this.mainWindow = new GrabArt.GApp.UI.MainWidget();
-            this.startButton = new GrabArt.GApp.UI.StartButton();
-            this.copyButton = new GrabArt.GApp.UI.CopyButton();
-            this.progressBar = new GrabArt.GApp.UI.GrabProgress();
-            this.grid = new GrabArt.GApp.UI.Grid(10, 10);
-        }
-        Application.prototype.main = function () {
-            this.mainWindow.addWidget(this.startButton).addWidget(this.copyButton).addWidget(this.progressBar).addWidget(this.grid);
-            this.grid.activateCell(2, 2);
-            this.mainWindow.enableDragging();
-            this.wireEvents();
-            $(this.page).append(this.mainWindow.draw());
-        };
-        Application.prototype.grid_Resize_GetCallback = function () {
-            var _this = this;
-            return function (sender, args) {
-                _this.mainWindow.resize(args.dw, args.dh);
-                _this.copyButton.resize(args.dw, 0);
-                _this.progressBar.resize(args.dw, 0);
-                _this.mainWindow.redraw();
+    (function (GApp) {
+        var Application = (function () {
+            function Application(page) {
+                this.page = page;
+                this.mainWindow = new GrabArt.GApp.UI.MainWidget();
+                this.startButton = new GrabArt.GApp.UI.StartButton();
+                this.copyButton = new GrabArt.GApp.UI.CopyButton();
+                this.progressBar = new GrabArt.GApp.UI.GrabProgress();
+                this.grid = new GrabArt.GApp.UI.Grid(20, 10);
             }
-        };
-        Application.prototype.startButton_Click_GetCallback = function () {
-            var _this = this;
-            return function (sender, args) {
-                _this.grid.setGridDimensions(200, 100).redraw();
-            }
-        };
-        Application.prototype.wireEvents = function () {
-            this.grid.Resize.addListener(this.grid_Resize_GetCallback());
-            this.startButton.Click.addListener(this.startButton_Click_GetCallback());
-        };
-        Application.prototype.run = function () {
-            try  {
-                this.main();
-            } catch (exc) {
-                GrabArt.Core.Console.writeLine('Exception: ' + exc, 'red');
-            }
-        };
-        return Application;
-    })();
-    GrabArt.Application = Application;    
+            Application.prototype.main = function () {
+                this.mainWindow.addWidget(this.startButton).addWidget(this.copyButton).addWidget(this.progressBar).addWidget(this.grid);
+                this.grid.activateCell(2, 2);
+                this.mainWindow.enableDragging();
+                this.applyColorScheme().wireEvents();
+                $(this.page).append(this.mainWindow.draw());
+            };
+            Application.prototype.grid_Resize_GetCallback = function () {
+                var _this = this;
+                return function (sender, args) {
+                    _this.mainWindow.resize(args.dw, args.dh);
+                    _this.copyButton.resize(args.dw, 0);
+                    _this.progressBar.resize(args.dw, 0);
+                    _this.mainWindow.redraw();
+                }
+            };
+            Application.prototype.startButton_Click_GetCallback = function () {
+                var _this = this;
+                return function (sender, args) {
+                    _this.grid.setGridDimensions(200, 100).redraw();
+                }
+            };
+            Application.prototype.applyColorScheme = function () {
+                var colorScheme = GrabArt.GApp.Config.colorScheme;
+                this.mainWindow.setBackgroundColor(colorScheme.mainWindowColor);
+                this.startButton.setBasicColor(colorScheme.startButton.basicColor).setHoverColor(colorScheme.startButton.hoverColor).setPressedColor(colorScheme.startButton.pressedColor);
+                this.copyButton.setBasicColor(colorScheme.startButton.basicColor).setHoverColor(colorScheme.startButton.hoverColor).setPressedColor(colorScheme.startButton.pressedColor);
+                this.progressBar.setBarColor(colorScheme.progressBar.barColor).setBackgroundColor(colorScheme.progressBar.backColor);
+                this.grid.setActiveColor(colorScheme.grid.activeColor).setRegularColor(colorScheme.grid.regularColor).setBackgroundColor(colorScheme.mainWindowColor);
+                return this;
+            };
+            Application.prototype.wireEvents = function () {
+                this.grid.Resize.addListener(this.grid_Resize_GetCallback());
+                this.startButton.Click.addListener(this.startButton_Click_GetCallback());
+                return this;
+            };
+            Application.prototype.run = function () {
+                try  {
+                    this.main();
+                } catch (exc) {
+                    GrabArt.Core.Console.writeLine('Exception: ' + exc, 'red');
+                }
+            };
+            return Application;
+        })();
+        GApp.Application = Application;        
+    })(GrabArt.GApp || (GrabArt.GApp = {}));
+    var GApp = GrabArt.GApp;
+
 })(GrabArt || (GrabArt = {}));
 
 var GrabArt;

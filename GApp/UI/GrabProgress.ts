@@ -6,6 +6,7 @@ module GrabArt.GApp.UI {
             super('grabProgress');
             this.setPosition({x: 115, y: 47})
                 .setSizes({w: 175, h: 33});
+            this.setProgress(10);
         }
     }
 }
