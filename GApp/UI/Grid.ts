@@ -5,7 +5,9 @@ module GrabArt.GApp.UI {
         private separatorSize : number = 1;
         private activeColor   : string = 'red';
         private regularColor  : string = 'yellow';
+        private selectColor   : string = 'yellow';
         private cellSizes     : {w: number; h: number;};
+        private prevSelected  : {x: number; y: number;} = null;
         private cellsMap = [];
 
         private resizeEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
@@ -17,7 +19,7 @@ module GrabArt.GApp.UI {
 
             this.Resize = this.resizeEv;
 
-            this.setPosition({x: 10, y: 90})
+            this.setPosition({x: 10, y: 115})
                 .setSizes({w: 280, h: 100});
         }
 
@@ -76,6 +78,10 @@ module GrabArt.GApp.UI {
                 heightOffset += cellHeight + this.separatorSize;
             }
 
+            if (this.prevSelected !== null) {
+                this.selectCell(this.prevSelected.x, this.prevSelected.y);
+            }
+
             if (dw != 0 || dh != 0) this.resizeEv.fire(this, {dw: dw, dh: dh});
         }
 
@@ -86,6 +92,38 @@ module GrabArt.GApp.UI {
             this.cellsMap[x]    = this.cellsMap[x] || [];
             this.cellsMap[x][y] = true;
             this.drawCell(x, y, this.activeColor);
+        }
+
+        selectCell(x : number, y : number) : void {
+            if (x < 0 || x >= this.getGridDimensions().nw) throw "x parameter out of bounds";
+            if (y < 0 || y >= this.getGridDimensions().nh) throw "y parameter out of bounds";
+
+            if (this.domElement__) {
+                var   context = this.domElement__[0].getContext('2d')
+                    , currentStyle = context.strokeStyle;
+
+                if (this.prevSelected !== null) {
+                    context.strokeStyle = this.getBackgroundColor();
+                    context.strokeRect(
+                          (this.cellSizes.w + this.separatorSize) * this.prevSelected.x - this.separatorSize
+                        , (this.cellSizes.h + this.separatorSize) * this.prevSelected.y - this.separatorSize
+                        , this.cellSizes.w + 2 * this.separatorSize
+                        , this.cellSizes.h + 2 * this.separatorSize
+                    );
+                }
+
+                context.strokeStyle = this.selectColor;
+                context.strokeRect(
+                      (this.cellSizes.w + this.separatorSize) * x - this.separatorSize
+                    , (this.cellSizes.h + this.separatorSize) * y - this.separatorSize
+                    , this.cellSizes.w + 2 * this.separatorSize
+                    , this.cellSizes.h + 2 * this.separatorSize
+                );
+
+                context.strokeStyle = currentStyle;
+            }
+
+            this.prevSelected = {x: x, y: y};
         }
 
         private drawCell(x : number, y : number, color : string) : void {

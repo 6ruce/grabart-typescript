@@ -5,7 +5,7 @@ module GrabArt.GApp.UI {
         constructor() {
             super('main');
             this.setPosition({ x : 600, y : 100, relative : 'fixed' })
-                .setSizes({ w : 300, h : 200 });
+                .setSizes({ w : 300, h : 225 });
         }
     }
 }
