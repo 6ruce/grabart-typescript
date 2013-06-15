@@ -21,14 +21,19 @@ module GrabArt.GApp {
             this.mainWindow.addWidget(this.startButton)
                            .addWidget(this.copyButton)
                            .addWidget(this.progressBar)
-                           .addWidget(this.layers)
-                           .addWidget(this.grid);
+                           .addWidget(this.grid)
+                           .addWidget(this.layers);
 
             this.grid.activateCell(2, 2);
             this.grid.selectCell(4, 4);
+            this.mainWindow.enableDragging();
+
             this.layers.addLayer({w: 10, h: 10});
             this.layers.addLayer({w: 11, h: 330});
-            this.mainWindow.enableDragging();
+            this.layers.addLayer({w: 123, h: 330});
+            this.layers.addLayer({w: 136456, h: 330});
+            this.layers.addLayer({w: 17856, h: 330});
+            this.layers.setSelectedLayer(10);
 
             this.applyColorScheme().wireEvents();
             this.setMainWidget(this.mainWindow);
@@ -53,6 +58,14 @@ module GrabArt.GApp {
         copyButton_Click_GetCallback() : (sender : Object, args : any) => void {
             return (sender, args) => {
                 this.progressBar.increase(10).redraw();
+            };
+        }
+
+        layers_Resize_GetCallback() : (sender : Object, args : any) => void {
+            return (sender, args) => {
+                console.log('dw:' + args.dw + ' dh:' + args.dh);
+                this.grid.moveOn(args.dw, args.dh);
+                this.mainWindow.resize(args.dw, args.dh).redraw();
             };
         }
 
@@ -82,6 +95,7 @@ module GrabArt.GApp {
             this.grid.Resize.addListener(this.grid_Resize_GetCallback());
             this.startButton.Click.addListener(this.startButton_Click_GetCallback());
             this.copyButton.Click.addListener(this.copyButton_Click_GetCallback());
+            this.layers.Resize.addListener(this.layers_Resize_GetCallback());
             return this;
         }
     }

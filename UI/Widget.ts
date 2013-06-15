@@ -34,15 +34,17 @@ module GrabArt.UI {
         domId__       : string    = null;
         domElement__  : any       = null;
 
-        private dragger      : GrabArt.UI.Services.Dragger   = null;
+        private dragger       : GrabArt.UI.Services.Dragger   = null;
 
-        private mouseOverEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
-        private mouseOutEv   : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
-        private mouseLeaveEv : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
-        private mouseMoveEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
-        private mouseDownEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
-        private mouseUpEv    : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
-        private clickEv      : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseOverEv   : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseOutEv    : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseLeaveEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseMoveEv   : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseDownEv   : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private mouseUpEv     : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private clickEv       : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private sizesChangeEv : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
+        private resizeEv      : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
 
         public  MouseOver   : GrabArt.Core.Event;
         public  MouseOut    : GrabArt.Core.Event;
@@ -51,6 +53,8 @@ module GrabArt.UI {
         public  MouseDown   : GrabArt.Core.Event;
         public  MouseUp     : GrabArt.Core.Event;
         public  Click       : GrabArt.Core.Event;
+        public  SizesChange : GrabArt.Core.Event;
+        public  Resize      : GrabArt.Core.Event;
 
 
         constructor (private name : string) {
@@ -61,6 +65,8 @@ module GrabArt.UI {
             this.MouseDown   = this.mouseDownEv;
             this.MouseUp     = this.mouseUpEv;
             this.Click       = this.clickEv;
+            this.SizesChange = this.sizesChangeEv;
+            this.Resize      = this.resizeEv;
         }
 
         draw() : any {
@@ -133,6 +139,11 @@ module GrabArt.UI {
             return this;
         }
 
+        moveOn(dx : number, dy : number) : Widget {
+            this.setPosition({x: this.getPosition().x + dx, y: this.getPosition().y + dy});
+            return this;
+        }
+
         getPosition() : IPosition {
             return this.position;
         }
@@ -142,14 +153,18 @@ module GrabArt.UI {
                 throw "sizes is null";
             }
 
-            this.sizes = sizes;
+            var oldSizes = this.sizes;
 
+            this.sizes = sizes;
+            if (sizes.w != oldSizes.w || sizes.h != oldSizes.h) {
+                this.resizeEv.fire(this, {dw: sizes.w - oldSizes.w, dh: sizes.h - oldSizes.h});
+            }
+            this.sizesChangeEv.fire(this, sizes);
             return this;
         }
 
         resize(dw : number, dh : number) : Widget {
-            this.sizes.w += dw;
-            this.sizes.h += dh;
+            this.setSizes({w: this.sizes.w + dw, h: this.sizes.h + dh});
             return this;
         }
 

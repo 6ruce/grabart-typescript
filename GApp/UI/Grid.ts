@@ -12,8 +12,6 @@ module GrabArt.GApp.UI {
 
         private resizeEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
 
-        public  Resize    : GrabArt.Core.Event;
-
         constructor(private nw : number, private nh : number) {
             super('grid');
 
