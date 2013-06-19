@@ -11,7 +11,7 @@ module GrabArt.Core {
         private static runners : {[name : string] : number;} = {};
 
         static create(name : string, interval : number, func : IRunner) : void {
-            var id = setInterval(func, interval);
+            var id = setInterval(func, interval * 1000);
             Process.runners[name] = id;
         }
 

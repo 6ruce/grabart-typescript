@@ -15,7 +15,8 @@ module GrabArt.UI.Services {
                     $(this.page).append(this.mainWidget.draw());
                 }
             } catch (exc) {
-                GrabArt.Core.Console.writeLine('Exception: ' + exc, 'red');
+                //console.log(exc);
+                GrabArt.Core.Console.writeLine('Exception: ' + exc.stack, 'red');
             }
         }
 

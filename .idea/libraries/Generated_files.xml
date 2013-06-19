@@ -2,48 +2,52 @@
   <library name="Generated files" type="javaScript">
     <properties>
       <sourceFilesUrls>
-        <item url="file://$PROJECT_DIR$/Tests/TestCase.js" />
-        <item url="file://$PROJECT_DIR$/UI/WidgetContainer.js" />
-        <item url="file://$PROJECT_DIR$/UI/Widget.js" />
-        <item url="file://$PROJECT_DIR$/tests.link.js" />
-        <item url="file://$PROJECT_DIR$/Application.js" />
-        <item url="file://$PROJECT_DIR$/Core/Console.js" />
-        <item url="file://$PROJECT_DIR$/Tests/SampleTest.js" />
-        <item url="file://$PROJECT_DIR$/UI/widget.js" />
+        <item url="file://$PROJECT_DIR$/GApp/UI/MainWidget.js" />
         <item url="file://$PROJECT_DIR$/Tests/TestSuit.js" />
-        <item url="file://$PROJECT_DIR$/Core/Process.js" />
+        <item url="file://$PROJECT_DIR$/UI/Services/Application.js" />
+        <item url="file://$PROJECT_DIR$/GApp/UI/Grid.js" />
+        <item url="file://$PROJECT_DIR$/deploy.link.js" />
+        <item url="file://$PROJECT_DIR$/UI/Widget.js" />
+        <item url="file://$PROJECT_DIR$/GApp/Workers/LayerFinder.js" />
+        <item url="file://$PROJECT_DIR$/main.js" />
+        <item url="file://$PROJECT_DIR$/GApp/Application.js" />
+        <item url="file://$PROJECT_DIR$/Tests/TestCase.js" />
         <item url="file://$PROJECT_DIR$/Core/Event.js" />
+        <item url="file://$PROJECT_DIR$/GApp/UI/Layers.js" />
+        <item url="file://$PROJECT_DIR$/UI/ContainingWidget.js" />
+        <item url="file://$PROJECT_DIR$/Core/Console.js" />
+        <item url="file://$PROJECT_DIR$/Core/Process.js" />
+        <item url="file://$PROJECT_DIR$/main.link.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/Core/console.js" />
-      <root url="file://$PROJECT_DIR$/Core/console.js" />
-      <root url="file://$PROJECT_DIR$/Core/event.js" />
-      <root url="file://$PROJECT_DIR$/Core/process.js" />
-      <root url="file://$PROJECT_DIR$/Core/event.js" />
-      <root url="file://$PROJECT_DIR$/Tests/testCase.js" />
-      <root url="file://$PROJECT_DIR$/Core/process.js" />
       <root url="file://$PROJECT_DIR$/Tests/sampleTest.js" />
-      <root url="file://$PROJECT_DIR$/Tests/testCase.js" />
       <root url="file://$PROJECT_DIR$/Tests/sampleTest.js" />
-      <root url="file://$PROJECT_DIR$/Tests/testSuit.js" />
       <root url="file://$PROJECT_DIR$/Tests/SomeTest.js" />
-      <root url="file://$PROJECT_DIR$/Tests/testSuit.js" />
       <root url="file://$PROJECT_DIR$/Tests/SomeTest.js" />
       <root url="file://$PROJECT_DIR$/UI/widgetContainer.js" />
       <root url="file://$PROJECT_DIR$/UI/widgetContainer.js" />
-      <root url="file://$PROJECT_DIR$/UI/widget.js" />
-      <root url="file://$PROJECT_DIR$/UI/Widget.js" />
-      <root url="file://$PROJECT_DIR$/UI/WidgetContainer.js" />
-      <root url="file://$PROJECT_DIR$/Tests/TestCase.js" />
+      <root url="file://$PROJECT_DIR$/UI/widgetContainer.js" />
       <root url="file://$PROJECT_DIR$/tests.link.js" />
       <root url="file://$PROJECT_DIR$/Application.js" />
-      <root url="file://$PROJECT_DIR$/Core/Console.js" />
-      <root url="file://$PROJECT_DIR$/Tests/SampleTest.js" />
-      <root url="file://$PROJECT_DIR$/UI/widget.js" />
+      <root url="file://$PROJECT_DIR$/Tests/sampleTest.js" />
+      <root url="file://$PROJECT_DIR$/main.js" />
+      <root url="file://$PROJECT_DIR$/GApp/UI/MainWidget.js" />
       <root url="file://$PROJECT_DIR$/Tests/TestSuit.js" />
-      <root url="file://$PROJECT_DIR$/Core/Process.js" />
+      <root url="file://$PROJECT_DIR$/UI/Services/Application.js" />
+      <root url="file://$PROJECT_DIR$/GApp/UI/Grid.js" />
+      <root url="file://$PROJECT_DIR$/deploy.link.js" />
+      <root url="file://$PROJECT_DIR$/UI/Widget.js" />
+      <root url="file://$PROJECT_DIR$/GApp/Workers/LayerFinder.js" />
+      <root url="file://$PROJECT_DIR$/main.js" />
+      <root url="file://$PROJECT_DIR$/Tests/TestCase.js" />
+      <root url="file://$PROJECT_DIR$/GApp/Application.js" />
       <root url="file://$PROJECT_DIR$/Core/Event.js" />
+      <root url="file://$PROJECT_DIR$/GApp/UI/Layers.js" />
+      <root url="file://$PROJECT_DIR$/Core/Console.js" />
+      <root url="file://$PROJECT_DIR$/UI/ContainingWidget.js" />
+      <root url="file://$PROJECT_DIR$/Core/Process.js" />
+      <root url="file://$PROJECT_DIR$/main.link.js" />
     </CLASSES>
     <SOURCES />
   </library>

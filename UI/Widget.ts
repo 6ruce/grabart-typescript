@@ -28,6 +28,7 @@ module GrabArt.UI {
         private visible       : bool      = true;
         private bgColor       : string    = 'grey';
         private cursorStyle   : string    = 'default';
+        private zIndex        : number    = 1;
 
         /** protected */
         unit__        : string    = 'px';
@@ -103,6 +104,7 @@ module GrabArt.UI {
                 , backgroundColor : this.bgColor
                 , position        : this.position.relative || this.defaultRelativePos
                 , cursor          : this.cursorStyle
+                , zIndex          : this.zIndex
             });
         }
 
@@ -199,6 +201,11 @@ module GrabArt.UI {
 
         getUnit() : string {
             return this.unit__;
+        }
+
+        setZIndex(zIndex : number) : Widget {
+            this.zIndex = zIndex;
+            return this;
         }
 
         setBackgroundColor(color : string) : Widget {

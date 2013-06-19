@@ -12,7 +12,7 @@ module GrabArt.GApp.UI {
         private selectedLayer   : number = null;
         private initialHeight   : number = 0;
         private initialHOffset  : number = 2;
-        private initialVOffset  : number = 4;
+        private initialVOffset  : number = 2;
         private padding         : number = 3;
         private fontColorActive : string = 'white';
         private fontColor       : string = '#B5B5B5';
@@ -21,10 +21,11 @@ module GrabArt.GApp.UI {
         constructor() {
             super('layers');
 
-            var height = 25;
+            var height = 18;
 
             this.setPosition({x: 10, y: 85})
                 .setSizes({w: 280, h: height});
+
             this.initialHeight = height;
         }
 
@@ -46,100 +47,100 @@ module GrabArt.GApp.UI {
                 currentLayerLabel = '',
                 horizontalOffset  = this.initialHOffset,
                 verticalOffset    = this.initialHeight / 2 + this.initialVOffset,
-                emptyText         = '<- Layers ->';
-
-
+                emptyText         = '<- Layers ->',
+                trackIndex        = 0,
+                containerParams  ,
+                containerHeight  ;
 
             context.fillStyle = this.fontColor;
-            context.font = 'italic 16px Calibri';
+            context.font = 'italic 12px Calibri';
             if (this.layersWidths.length) {
-                var rowsAndHeight = this.separateOnRows(context);
-                if (rowsAndHeight.height != this.getSizes().h) {
-                    this.setSizes({w: this.getSizes().w, h: rowsAndHeight.height});
+                containerParams = this.calculateContainerParams(context);
+
+                containerHeight = this.initialHeight * containerParams.rowsCount;
+
+                if (containerHeight != this.getSizes().h) {
+                    this.setSizes({w: this.getSizes().w, h: containerHeight});
                     this.refreshCss__(domElement);
                     this.refreshCanvasSizes__(domElement);
-                    context.font = 'italic 16px Calibri';
+                    context.font = 'italic 12px Calibri';
                 }
 
                 context.fillStyle = this.backColor;
                 context.fillRect(0, 0, this.getSizes().w, this.getSizes().h);
 
-                for (var rowIndex in rowsAndHeight.rows) {
-                    var layers = rowsAndHeight.rows[rowIndex];
-                    for (var layerIndex in layers) {
-                        currentLayer      = layers[layerIndex];
-                        currentLayerLabel = currentLayer.w + 'x' + currentLayer.h;
+                for (var layerIndex in this.layersWidths) {
+                    currentLayer      = this.layers[this.layersWidths[layerIndex]];
+                    currentLayerLabel = currentLayer.w + 'x' + currentLayer.h;
 
-                        if (this.selectedLayer != null
-                            && currentLayer.w == this.selectedLayer)
-                        {
-                            context.fillStyle = this.fontColorActive;
-                        } else {
-                            context.fillStyle = this.fontColor;
-                        }
-
-                        context.fillText(
-                            currentLayerLabel,
-                            horizontalOffset  + this.padding,
-                            verticalOffset
-                        );
-                        horizontalOffset += this.padding * 2 + context.measureText(currentLayerLabel).width;
+                    if (this.selectedLayer != null
+                        && currentLayer.w == this.selectedLayer)
+                    {
+                        context.fillStyle = this.fontColorActive;
+                    } else {
+                        context.fillStyle = this.fontColor;
                     }
-                    horizontalOffset = this.initialHOffset;
-                    verticalOffset   += this.initialHeight;
+
+                    context.fillText(
+                        currentLayerLabel
+                        , horizontalOffset
+                        , verticalOffset
+                    );
+
+                    console.log('voff:' + verticalOffset + ' hoff:' + horizontalOffset);
+
+                    if (trackIndex == containerParams.columnsCount - 1) {
+                        horizontalOffset = this.initialHOffset;
+                        verticalOffset  += this.initialHeight;
+                        trackIndex = 0;
+                    } else {
+                        horizontalOffset += (this.padding + containerParams.cellWidth);
+                        trackIndex++;
+                    }
                 }
             } else {
                 context.fillText(
                     emptyText,
                     (this.getSizes().w - context.measureText(emptyText).width) / 2,
-                    (this.getSizes().h / 2 + 4)
+                    (this.getSizes().h / 2 + this.initialVOffset)
                 );
             }
 
             context.fillStyle = currentStyle;
         }
 
-        private separateOnRows(context : any) : {rows : any[]; height : number;} {
-            var horizontalOffset  = this.initialHOffset,
-                currentLayer      ,
-                currentLayerLabel ,
-                totalHeight       = this.initialHeight,
-                rowIndex          = 0,
-                rows : any[]      = [];
+        private calculateContainerParams(context : any)
+            : {rowsCount : number; columnsCount : number; cellWidth : number;}
+        {
+            var   currentLayer
+                , currentLayerLabel
+                , currentTextWidth
+                , columnsCount
+                , rowsCount
+                , maxTextWidth = 0;
 
-            for (var layerIndex in this.layersWidths.sort()) {
+            for (var layerIndex in this.layersWidths) {
                 currentLayer      = this.layers[this.layersWidths[layerIndex]];
                 currentLayerLabel = currentLayer.w + 'x' + currentLayer.h;
 
-                if (horizontalOffset
-                    + this.padding
-                    + context.measureText(currentLayerLabel).width >= this.getSizes().w)
-                {
-                    horizontalOffset = this.initialHOffset;
-                    totalHeight += this.initialVOffset + this.initialHeight;
-                    rowIndex++;
-                } else {
-                    horizontalOffset += this.padding * 2 + context.measureText(currentLayerLabel).width;
-                }
-
-                if (typeof rows[rowIndex] == 'undefined')
-                    rows[rowIndex] = [];
-
-                rows[rowIndex].push(currentLayer);
+                currentTextWidth = context.measureText(currentLayerLabel).width;
+                maxTextWidth     = maxTextWidth >= currentTextWidth ? maxTextWidth : currentTextWidth;
             }
 
-            return {rows : rows, height : totalHeight};
+            columnsCount = Math.floor((this.getSizes().w - 2 * this.initialHOffset) / (maxTextWidth + this.padding));
+            if (Math.floor(this.layersWidths.length / columnsCount) == this.layersWidths.length / columnsCount) {
+                rowsCount = Math.floor(this.layersWidths.length / columnsCount);
+            } else {
+                rowsCount = Math.floor(this.layersWidths.length / columnsCount) + 1;
+            }
+
+            return {rowsCount : rowsCount, columnsCount : columnsCount, cellWidth : maxTextWidth};
         }
 
         addLayer(layer : Layer) : Layers {
             if (layer == null) throw 'layer is null';
             this.layers[layer.w] = layer;
             this.layersWidths.push(layer.w);
-            return this;
-        }
-
-        setSizes(sizes : {w: number; h: number;}) : Layers {
-            super.setSizes(sizes);
             return this;
         }
 

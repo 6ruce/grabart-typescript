@@ -8,6 +8,7 @@ module GrabArt.GApp.UI {
         private selectColor   : string = 'yellow';
         private cellSizes     : {w: number; h: number;};
         private prevSelected  : {x: number; y: number;} = null;
+        private minCellSize   : number = 4;
         private cellsMap = [];
 
         private resizeEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
@@ -17,7 +18,7 @@ module GrabArt.GApp.UI {
 
             this.Resize = this.resizeEv;
 
-            this.setPosition({x: 10, y: 115})
+            this.setPosition({x: 10, y: 110})
                 .setSizes({w: 280, h: 100});
         }
 
@@ -33,30 +34,28 @@ module GrabArt.GApp.UI {
         }
 
         private buildGrid(domElement) : void {
-            var heightOffset = 0,
-                widthOffset  = 0,
-                dw           = 0,
-                dh           = 0,
+            var heightOffset ,
+                widthOffset  ,
+                dw           ,
+                dh           ,
                 context      = domElement[0].getContext('2d'),
                 heightBlocks = this.nh,
                 widthBlocks  = this.nw,
                 cellWidth    = Math.round((this.getSizes().w - (widthBlocks  - 1) * this.separatorSize) / widthBlocks ),
                 cellHeight   = Math.round((this.getSizes().h - (heightBlocks - 1) * this.separatorSize) / heightBlocks);
 
-            cellWidth  = (cellWidth  < 2) ? 2 : cellWidth;
-            cellHeight = (cellHeight < 2) ? 2 : cellHeight;
+            cellWidth  = (cellWidth  < this.minCellSize) ? this.minCellSize : cellWidth;
+            cellHeight = (cellHeight < this.minCellSize) ? this.minCellSize : cellHeight;
 
             this.cellSizes = {w: cellWidth, h: cellHeight};
 
             widthOffset  = (cellWidth  + this.separatorSize) * this.nw;
             heightOffset = (cellHeight + this.separatorSize) * this.nh;
-            if (widthOffset  - this.getSizes().w > 2) {
-                dw = widthOffset  - this.getSizes().w;
-                this.setSizes({w: widthOffset, h: this.getSizes().h});
-            }
-            if (heightOffset - this.getSizes().h > 2) {
-                dh = heightOffset - this.getSizes().h;
-                this.setSizes({w: this.getSizes().w, h: heightOffset});
+
+            dw = widthOffset  - this.getSizes().w;
+            dh = heightOffset - this.getSizes().h;
+            if (dw > 2 || dh > 2) {
+                this.resize(dw, dh);
             }
 
             if (dw != 0 || dh != 0) {
@@ -79,8 +78,6 @@ module GrabArt.GApp.UI {
             if (this.prevSelected !== null) {
                 this.selectCell(this.prevSelected.x, this.prevSelected.y);
             }
-
-            if (dw != 0 || dh != 0) this.resizeEv.fire(this, {dw: dw, dh: dh});
         }
 
         activateCell(x : number, y : number) : void {

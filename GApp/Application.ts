@@ -4,9 +4,11 @@
 /// <reference  path="UI/GrabProgress.ts"               />
 /// <reference  path="UI/Layers.ts"                     />
 /// <reference  path="UI/Grid.ts"                       />
+/// <reference  path="Workers/LayerFinder.ts"           />
 /// <reference  path="Config.ts"                        />
 /// <reference_ path="../jquery.d.ts"                   />
 /// <reference  path="../UI/Services/Application.ts"    />
+/// <reference  path="../Core/Process.ts"               />
 
 module GrabArt.GApp {
     export class Application extends GrabArt.UI.Services.Application {
@@ -16,6 +18,8 @@ module GrabArt.GApp {
         private progressBar = new GrabArt.GApp.UI.GrabProgress();
         private layers      = new GrabArt.GApp.UI.Layers();
         private grid        = new GrabArt.GApp.UI.Grid(20, 10);
+
+        private layerFinder = new GrabArt.GApp.Workers.LayerFinder();
 
         main() : void {
             this.mainWindow.addWidget(this.startButton)
@@ -28,12 +32,10 @@ module GrabArt.GApp {
             this.grid.selectCell(4, 4);
             this.mainWindow.enableDragging();
 
-            this.layers.addLayer({w: 10, h: 10});
-            this.layers.addLayer({w: 11, h: 330});
-            this.layers.addLayer({w: 123, h: 330});
-            this.layers.addLayer({w: 136456, h: 330});
-            this.layers.addLayer({w: 17856, h: 330});
-            this.layers.setSelectedLayer(10);
+            //this.layers.addLayer({w: 10, h: 10});
+            //this.layers.addLayer({w: 12, h: 10});
+            //this.layers.addLayer({w: 13, h: 10});
+            GrabArt.Core.Process.create('layerFinder', 1, this.layerFinder.getRunner());
 
             this.applyColorScheme().wireEvents();
             this.setMainWidget(this.mainWindow);
@@ -41,6 +43,7 @@ module GrabArt.GApp {
 
         grid_Resize_GetCallback() : (sender : Object, args : any) => void {
             return (sender, args) => {
+                console.log('dw:' + args.dw + ' dh:' + args.dh);
                 this.mainWindow.resize(args.dw, args.dh);
                 this.copyButton.resize(args.dw, 0);
                 this.progressBar.resize(args.dw, 0);
@@ -63,10 +66,23 @@ module GrabArt.GApp {
 
         layers_Resize_GetCallback() : (sender : Object, args : any) => void {
             return (sender, args) => {
-                console.log('dw:' + args.dw + ' dh:' + args.dh);
-                this.grid.moveOn(args.dw, args.dh);
-                this.mainWindow.resize(args.dw, args.dh).redraw();
+                if (args.dh) {
+                    this.grid.moveOn(0, args.dh);
+                    this.mainWindow.resize(0, args.dh).redraw();
+                }
             };
+        }
+
+        layerFinder_LayerFound_GetCallback() : (sender : Object, args : any) => void {
+            return (sender, args) => {
+                this.layers.addLayer(args).redraw();
+            }
+        }
+
+        layerFinder_LayerChanged_GetCallback() : (sender : Object, args : any) => void {
+            return (sender, args) => {
+                this.layers.setSelectedLayer(args.w).redraw();
+            }
         }
 
         private applyColorScheme() : Application {
@@ -96,6 +112,8 @@ module GrabArt.GApp {
             this.startButton.Click.addListener(this.startButton_Click_GetCallback());
             this.copyButton.Click.addListener(this.copyButton_Click_GetCallback());
             this.layers.Resize.addListener(this.layers_Resize_GetCallback());
+            this.layerFinder.LayerFound.addListener(this.layerFinder_LayerFound_GetCallback());
+            this.layerFinder.LayerChanged.addListener(this.layerFinder_LayerChanged_GetCallback());
             return this;
         }
     }
