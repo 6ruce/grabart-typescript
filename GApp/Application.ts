@@ -43,7 +43,6 @@ module GrabArt.GApp {
 
         grid_Resize_GetCallback() : (sender : Object, args : any) => void {
             return (sender, args) => {
-                console.log('dw:' + args.dw + ' dh:' + args.dh);
                 this.mainWindow.resize(args.dw, args.dh);
                 this.copyButton.resize(args.dw, 0);
                 this.progressBar.resize(args.dw, 0);
@@ -81,7 +80,7 @@ module GrabArt.GApp {
 
         layerFinder_LayerChanged_GetCallback() : (sender : Object, args : any) => void {
             return (sender, args) => {
-                this.layers.setSelectedLayer(args.w).redraw();
+                this.layers.setSelectedLayer(args).redraw();
             }
         }
 

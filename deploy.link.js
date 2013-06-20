@@ -142,6 +142,7 @@ var GrabArt;
                 this.visible = true;
                 this.bgColor = 'grey';
                 this.cursorStyle = 'default';
+                this.zIndex = 1;
                 this.unit__ = 'px';
                 this.domId__ = null;
                 this.domElement__ = null;
@@ -153,6 +154,8 @@ var GrabArt;
                 this.mouseDownEv = new GrabArt.Core.EntireEvent();
                 this.mouseUpEv = new GrabArt.Core.EntireEvent();
                 this.clickEv = new GrabArt.Core.EntireEvent();
+                this.sizesChangeEv = new GrabArt.Core.EntireEvent();
+                this.resizeEv = new GrabArt.Core.EntireEvent();
                 this.MouseOver = this.mouseOverEv;
                 this.MouseOut = this.mouseOutEv;
                 this.MouseLeave = this.mouseLeaveEv;
@@ -160,6 +163,8 @@ var GrabArt;
                 this.MouseDown = this.mouseDownEv;
                 this.MouseUp = this.mouseUpEv;
                 this.Click = this.clickEv;
+                this.SizesChange = this.sizesChangeEv;
+                this.Resize = this.resizeEv;
             }
             Widget.prototype.draw = function () {
                 if(this.domElement__ === null) {
@@ -188,7 +193,8 @@ var GrabArt;
                     height: this.sizes.h + this.unit__,
                     backgroundColor: this.bgColor,
                     position: this.position.relative || this.defaultRelativePos,
-                    cursor: this.cursorStyle
+                    cursor: this.cursorStyle,
+                    zIndex: this.zIndex
                 });
             };
             Widget.prototype.bindEvents__ = function (domElement) {
@@ -228,6 +234,13 @@ var GrabArt;
                 this.position.relative = position.relative || this.position.relative || this.defaultRelativePos;
                 return this;
             };
+            Widget.prototype.moveOn = function (dx, dy) {
+                this.setPosition({
+                    x: this.getPosition().x + dx,
+                    y: this.getPosition().y + dy
+                });
+                return this;
+            };
             Widget.prototype.getPosition = function () {
                 return this.position;
             };
@@ -235,12 +248,22 @@ var GrabArt;
                 if(sizes === null) {
                     throw "sizes is null";
                 }
+                var oldSizes = this.sizes;
                 this.sizes = sizes;
+                if(sizes.w != oldSizes.w || sizes.h != oldSizes.h) {
+                    this.resizeEv.fire(this, {
+                        dw: sizes.w - oldSizes.w,
+                        dh: sizes.h - oldSizes.h
+                    });
+                }
+                this.sizesChangeEv.fire(this, sizes);
                 return this;
             };
             Widget.prototype.resize = function (dw, dh) {
-                this.sizes.w += dw;
-                this.sizes.h += dh;
+                this.setSizes({
+                    w: this.sizes.w + dw,
+                    h: this.sizes.h + dh
+                });
                 return this;
             };
             Widget.prototype.getSizes = function () {
@@ -264,6 +287,10 @@ var GrabArt;
             };
             Widget.prototype.getUnit = function () {
                 return this.unit__;
+            };
+            Widget.prototype.setZIndex = function (zIndex) {
+                this.zIndex = zIndex;
+                return this;
             };
             Widget.prototype.setBackgroundColor = function (color) {
                 if(color == null || color == '') {
@@ -334,7 +361,7 @@ var GrabArt;
                     }).setSizes({
                         w: 300,
                         h: 225
-                    });
+                    }).setZIndex(3000);
                 }
                 return MainWidget;
             })(GrabArt.UI.ContainingWidget);
@@ -653,6 +680,21 @@ var GrabArt;
 })(GrabArt || (GrabArt = {}));
 var GrabArt;
 (function (GrabArt) {
+    (function (Core) {
+        var Console = (function () {
+            function Console() { }
+            Console.writeLine = function writeLine(text, color) {
+                if (typeof color === "undefined") { color = "black"; }
+                $('#consoleContent').append($('<div></div>').html('> ' + text).css('color', color));
+            };
+            return Console;
+        })();
+        Core.Console = Console;        
+    })(GrabArt.Core || (GrabArt.Core = {}));
+    var Core = GrabArt.Core;
+})(GrabArt || (GrabArt = {}));
+var GrabArt;
+(function (GrabArt) {
     (function (GApp) {
         (function (UI) {
             var Layers = (function (_super) {
@@ -663,16 +705,22 @@ var GrabArt;
                     };
                     this.layersWidths = [];
                     this.selectedLayer = null;
-                    this.padding = 5;
-                    this.fontColor = 'white';
-                    this.separatorSize = 1;
+                    this.initialHeight = 0;
+                    this.initialHOffset = 2;
+                    this.initialVOffset = 2;
+                    this.padding = 3;
+                    this.fontColorActive = 'white';
+                    this.fontColor = '#B5B5B5';
+                    this.backColor = 'grey';
+                    var height = 18;
                     this.setPosition({
                         x: 10,
                         y: 85
                     }).setSizes({
                         w: 280,
-                        h: 25
+                        h: height
                     });
+                    this.initialHeight = height;
                 }
                 Layers.prototype.draw = function () {
                     var domElement = _super.prototype.draw.call(this);
@@ -684,27 +732,75 @@ var GrabArt;
                     this.refreshLayers(this.domElement__);
                 };
                 Layers.prototype.refreshLayers = function (domElement) {
-                    var context = domElement[0].getContext('2d'), currentStyle = context.fillStyle, currentLayer = null, currentLayerLabel = '', horizontalOffset = 5, emptyText = '<- Layers ->';
+                    var context = domElement[0].getContext('2d'), currentStyle = context.fillStyle, currentLayer = null, currentLayerLabel = '', horizontalOffset = this.initialHOffset, verticalOffset = this.initialHeight / 2 + this.initialVOffset, emptyText = '<- Layers ->', trackIndex = 0, containerParams, containerHeight;
                     context.fillStyle = this.fontColor;
-                    context.font = 'italic 16px Calibri';
-                    if(this.layersWidths.length) {
-                        for(var layerIndex in this.layersWidths.sort()) {
-                            currentLayer = this.layers[this.layersWidths[layerIndex]];
+                    context.font = 'italic 13px Calibri';
+                    if(Object.keys(this.layers).length) {
+                        containerParams = this.calculateContainerParams(context);
+                        containerHeight = this.initialHeight * containerParams.rowsCount;
+                        if(containerHeight != this.getSizes().h) {
+                            this.setSizes({
+                                w: this.getSizes().w,
+                                h: containerHeight
+                            });
+                            this.refreshCss__(domElement);
+                            this.refreshCanvasSizes__(domElement);
+                            context.font = 'italic 13px Calibri';
+                        }
+                        context.fillStyle = this.backColor;
+                        context.fillRect(0, 0, this.getSizes().w, this.getSizes().h);
+                        for(var layerIndex in this.layers) {
+                            currentLayer = this.layers[layerIndex];
                             currentLayerLabel = currentLayer.w + 'x' + currentLayer.h;
-                            context.fillText(currentLayerLabel, horizontalOffset + this.separatorSize + this.padding, this.getSizes().h / 2 + 4);
-                            horizontalOffset += this.separatorSize * 2 + this.padding * 2 + context.measureText(emptyText).width;
+                            if(this.selectedLayer != null && currentLayerLabel == this.selectedLayer) {
+                                context.fillStyle = this.fontColorActive;
+                            } else {
+                                context.fillStyle = this.fontColor;
+                            }
+                            context.fillText(currentLayerLabel, horizontalOffset, verticalOffset);
+                            if(trackIndex == containerParams.columnsCount - 1) {
+                                horizontalOffset = this.initialHOffset;
+                                verticalOffset += this.initialHeight;
+                                trackIndex = 0;
+                            } else {
+                                horizontalOffset += (this.padding + containerParams.cellWidth);
+                                trackIndex++;
+                            }
                         }
                     } else {
-                        context.fillText(emptyText, (this.getSizes().w - context.measureText(emptyText).width) / 2, (this.getSizes().h / 2 + 4));
+                        context.fillText(emptyText, (this.getSizes().w - context.measureText(emptyText).width) / 2, (this.getSizes().h / 2 + this.initialVOffset));
                     }
                     context.fillStyle = currentStyle;
+                };
+                Layers.prototype.calculateContainerParams = function (context) {
+                    var currentLayer, currentLayerLabel, currentTextWidth, columnsCount, rowsCount, maxTextWidth = 0, layerCount = Object.keys(this.layers).length;
+                    for(var layerIndex in this.layers) {
+                        currentLayer = this.layers[layerIndex];
+                        currentLayerLabel = currentLayer.w + 'x' + currentLayer.h;
+                        currentTextWidth = context.measureText(currentLayerLabel).width;
+                        maxTextWidth = maxTextWidth >= currentTextWidth ? maxTextWidth : currentTextWidth;
+                    }
+                    columnsCount = Math.floor((this.getSizes().w - 2 * this.initialHOffset) / (maxTextWidth + this.padding));
+                    if(Math.floor(layerCount / columnsCount) == layerCount / columnsCount) {
+                        rowsCount = Math.floor(layerCount / columnsCount);
+                    } else {
+                        rowsCount = Math.floor(layerCount / columnsCount) + 1;
+                    }
+                    return {
+                        rowsCount: rowsCount,
+                        columnsCount: columnsCount,
+                        cellWidth: maxTextWidth
+                    };
                 };
                 Layers.prototype.addLayer = function (layer) {
                     if(layer == null) {
                         throw 'layer is null';
                     }
-                    this.layers[layer.w] = layer;
-                    this.layersWidths.push(layer.w);
+                    this.layers[layer.w + 'x' + layer.h] = layer;
+                    return this;
+                };
+                Layers.prototype.setSelectedLayer = function (layer) {
+                    this.selectedLayer = layer.w + 'x' + layer.h;
                     return this;
                 };
                 return Layers;
@@ -730,12 +826,13 @@ var GrabArt;
                     this.regularColor = 'yellow';
                     this.selectColor = 'yellow';
                     this.prevSelected = null;
+                    this.minCellSize = 4;
                     this.cellsMap = [];
                     this.resizeEv = new GrabArt.Core.EntireEvent();
                     this.Resize = this.resizeEv;
                     this.setPosition({
                         x: 10,
-                        y: 115
+                        y: 110
                     }).setSizes({
                         w: 280,
                         h: 100
@@ -751,28 +848,19 @@ var GrabArt;
                     this.buildGrid(this.domElement__);
                 };
                 Grid.prototype.buildGrid = function (domElement) {
-                    var heightOffset = 0, widthOffset = 0, dw = 0, dh = 0, context = domElement[0].getContext('2d'), heightBlocks = this.nh, widthBlocks = this.nw, cellWidth = Math.round((this.getSizes().w - (widthBlocks - 1) * this.separatorSize) / widthBlocks), cellHeight = Math.round((this.getSizes().h - (heightBlocks - 1) * this.separatorSize) / heightBlocks);
-                    cellWidth = (cellWidth < 2) ? 2 : cellWidth;
-                    cellHeight = (cellHeight < 2) ? 2 : cellHeight;
+                    var heightOffset, widthOffset, dw, dh, context = domElement[0].getContext('2d'), heightBlocks = this.nh, widthBlocks = this.nw, cellWidth = Math.round((this.getSizes().w - (widthBlocks - 1) * this.separatorSize) / widthBlocks), cellHeight = Math.round((this.getSizes().h - (heightBlocks - 1) * this.separatorSize) / heightBlocks);
+                    cellWidth = (cellWidth < this.minCellSize) ? this.minCellSize : cellWidth;
+                    cellHeight = (cellHeight < this.minCellSize) ? this.minCellSize : cellHeight;
                     this.cellSizes = {
                         w: cellWidth,
                         h: cellHeight
                     };
                     widthOffset = (cellWidth + this.separatorSize) * this.nw;
                     heightOffset = (cellHeight + this.separatorSize) * this.nh;
-                    if(widthOffset - this.getSizes().w > 2) {
-                        dw = widthOffset - this.getSizes().w;
-                        this.setSizes({
-                            w: widthOffset,
-                            h: this.getSizes().h
-                        });
-                    }
-                    if(heightOffset - this.getSizes().h > 2) {
-                        dh = heightOffset - this.getSizes().h;
-                        this.setSizes({
-                            w: this.getSizes().w,
-                            h: heightOffset
-                        });
+                    dw = widthOffset - this.getSizes().w;
+                    dh = heightOffset - this.getSizes().h;
+                    if(dw > 2 || dh > 2) {
+                        this.resize(dw, dh);
                     }
                     if(dw != 0 || dh != 0) {
                         this.refreshCss__(domElement);
@@ -791,12 +879,6 @@ var GrabArt;
                     }
                     if(this.prevSelected !== null) {
                         this.selectCell(this.prevSelected.x, this.prevSelected.y);
-                    }
-                    if(dw != 0 || dh != 0) {
-                        this.resizeEv.fire(this, {
-                            dw: dw,
-                            dh: dh
-                        });
                     }
                 };
                 Grid.prototype.activateCell = function (x, y) {
@@ -876,6 +958,61 @@ var GrabArt;
 var GrabArt;
 (function (GrabArt) {
     (function (GApp) {
+        (function (Workers) {
+            var LayerFinder = (function () {
+                function LayerFinder() {
+                    this.layers = [];
+                    this.selectedLayer = '';
+                    this.layerFoundEv = new GrabArt.Core.EntireEvent();
+                    this.layerChangedEv = new GrabArt.Core.EntireEvent();
+                    this.LayerFound = this.layerFoundEv;
+                    this.LayerChanged = this.layerChangedEv;
+                }
+                LayerFinder.prototype.getRunner = function () {
+                    var _this = this;
+                    return function () {
+                        var layer = $('.m2-tileLayer').filter(function (_) {
+                            return $(this).children().length != 0;
+                        }).last(), key, width, height, imageWidth, imageHeight;
+                        if(layer[0]) {
+                            imageWidth = parseInt(layer.children().first().css('width'));
+                            imageHeight = parseInt(layer.children().first().css('height'));
+                            width = Math.round((parseInt(layer.css('width')) / imageWidth + 0.49)) * 512;
+                            height = Math.round((parseInt(layer.css('height')) / imageHeight + 0.49)) * 512;
+                            if(width == _this.stableCandidate) {
+                                key = width + 'x' + height;
+                                if(!_this.layers[key]) {
+                                    console.log(key);
+                                    console.log(_this.layers);
+                                    _this.layers[key] = layer;
+                                    _this.layerFoundEv.fire(_this, {
+                                        w: width,
+                                        h: height
+                                    });
+                                }
+                                if(_this.selectedLayer != key) {
+                                    _this.selectedLayer = key;
+                                    _this.layerChangedEv.fire(_this, {
+                                        w: width,
+                                        h: height
+                                    });
+                                }
+                            }
+                            _this.stableCandidate = width;
+                        }
+                    };
+                };
+                return LayerFinder;
+            })();
+            Workers.LayerFinder = LayerFinder;            
+        })(GApp.Workers || (GApp.Workers = {}));
+        var Workers = GApp.Workers;
+    })(GrabArt.GApp || (GrabArt.GApp = {}));
+    var GApp = GrabArt.GApp;
+})(GrabArt || (GrabArt = {}));
+var GrabArt;
+(function (GrabArt) {
+    (function (GApp) {
         var Config = (function () {
             function Config() { }
             Config.colorScheme = {
@@ -903,21 +1040,6 @@ var GrabArt;
 })(GrabArt || (GrabArt = {}));
 var GrabArt;
 (function (GrabArt) {
-    (function (Core) {
-        var Console = (function () {
-            function Console() { }
-            Console.writeLine = function writeLine(text, color) {
-                if (typeof color === "undefined") { color = "black"; }
-                $('#consoleContent').append($('<div></div>').html('> ' + text).css('color', color));
-            };
-            return Console;
-        })();
-        Core.Console = Console;        
-    })(GrabArt.Core || (GrabArt.Core = {}));
-    var Core = GrabArt.Core;
-})(GrabArt || (GrabArt = {}));
-var GrabArt;
-(function (GrabArt) {
     (function (UI) {
         (function (Services) {
             var Application = (function () {
@@ -932,7 +1054,7 @@ var GrabArt;
                             $(this.page).append(this.mainWidget.draw());
                         }
                     } catch (exc) {
-                        GrabArt.Core.Console.writeLine('Exception: ' + exc, 'red');
+                        GrabArt.Core.Console.writeLine('Exception: ' + exc.stack, 'red');
                     }
                 };
                 Application.prototype.setMainWidget = function (widget) {
@@ -954,6 +1076,28 @@ var GrabArt;
 })(GrabArt || (GrabArt = {}));
 var GrabArt;
 (function (GrabArt) {
+    (function (Core) {
+        var Process = (function () {
+            function Process() { }
+            Process.runners = {
+            };
+            Process.create = function create(name, interval, func) {
+                var id = setInterval(func, interval * 1000);
+                Process.runners[name] = id;
+            };
+            Process.remove = function remove(name) {
+                if(undefined != typeof (Process.runners[name])) {
+                    clearInterval(Process.runners[name]);
+                }
+            };
+            return Process;
+        })();
+        Core.Process = Process;        
+    })(GrabArt.Core || (GrabArt.Core = {}));
+    var Core = GrabArt.Core;
+})(GrabArt || (GrabArt = {}));
+var GrabArt;
+(function (GrabArt) {
     (function (GApp) {
         var Application = (function (_super) {
             __extends(Application, _super);
@@ -966,26 +1110,21 @@ var GrabArt;
                 this.progressBar = new GrabArt.GApp.UI.GrabProgress();
                 this.layers = new GrabArt.GApp.UI.Layers();
                 this.grid = new GrabArt.GApp.UI.Grid(20, 10);
+                this.layerFinder = new GrabArt.GApp.Workers.LayerFinder();
             }
             Application.prototype.main = function () {
-                this.mainWindow.addWidget(this.startButton).addWidget(this.copyButton).addWidget(this.progressBar).addWidget(this.layers).addWidget(this.grid);
+                this.mainWindow.addWidget(this.startButton).addWidget(this.copyButton).addWidget(this.progressBar).addWidget(this.grid).addWidget(this.layers);
                 this.grid.activateCell(2, 2);
                 this.grid.selectCell(4, 4);
-                this.layers.addLayer({
-                    w: 10,
-                    h: 10
-                });
-                this.layers.addLayer({
-                    w: 11,
-                    h: 330
-                });
                 this.mainWindow.enableDragging();
+                GrabArt.Core.Process.create('layerFinder', 1, this.layerFinder.getRunner());
                 this.applyColorScheme().wireEvents();
                 this.setMainWidget(this.mainWindow);
             };
             Application.prototype.grid_Resize_GetCallback = function () {
                 var _this = this;
                 return function (sender, args) {
+                    console.log('dw:' + args.dw + ' dh:' + args.dh);
                     _this.mainWindow.resize(args.dw, args.dh);
                     _this.copyButton.resize(args.dw, 0);
                     _this.progressBar.resize(args.dw, 0);
@@ -1005,6 +1144,27 @@ var GrabArt;
                     _this.progressBar.increase(10).redraw();
                 };
             };
+            Application.prototype.layers_Resize_GetCallback = function () {
+                var _this = this;
+                return function (sender, args) {
+                    if(args.dh) {
+                        _this.grid.moveOn(0, args.dh);
+                        _this.mainWindow.resize(0, args.dh).redraw();
+                    }
+                };
+            };
+            Application.prototype.layerFinder_LayerFound_GetCallback = function () {
+                var _this = this;
+                return function (sender, args) {
+                    _this.layers.addLayer(args).redraw();
+                };
+            };
+            Application.prototype.layerFinder_LayerChanged_GetCallback = function () {
+                var _this = this;
+                return function (sender, args) {
+                    _this.layers.setSelectedLayer(args).redraw();
+                };
+            };
             Application.prototype.applyColorScheme = function () {
                 var colorScheme = GrabArt.GApp.Config.colorScheme;
                 this.mainWindow.setBackgroundColor(colorScheme.mainWindowColor);
@@ -1018,6 +1178,9 @@ var GrabArt;
                 this.grid.Resize.addListener(this.grid_Resize_GetCallback());
                 this.startButton.Click.addListener(this.startButton_Click_GetCallback());
                 this.copyButton.Click.addListener(this.copyButton_Click_GetCallback());
+                this.layers.Resize.addListener(this.layers_Resize_GetCallback());
+                this.layerFinder.LayerFound.addListener(this.layerFinder_LayerFound_GetCallback());
+                this.layerFinder.LayerChanged.addListener(this.layerFinder_LayerChanged_GetCallback());
                 return this;
             };
             return Application;
