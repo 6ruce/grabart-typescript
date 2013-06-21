@@ -5,6 +5,7 @@
 /// <reference  path="UI/Layers.ts"                     />
 /// <reference  path="UI/Grid.ts"                       />
 /// <reference  path="Workers/LayerFinder.ts"           />
+/// <reference  path="Workers/Grabber.ts"               />
 /// <reference  path="Config.ts"                        />
 /// <reference_ path="../jquery.d.ts"                   />
 /// <reference  path="../UI/Services/Application.ts"    />
@@ -19,6 +20,7 @@ module GrabArt.GApp {
         private layers      = new GrabArt.GApp.UI.Layers();
         private grid        = new GrabArt.GApp.UI.Grid(20, 10);
 
+        private grabber     = new GrabArt.GApp.Workers.Grabber();
         private layerFinder = new GrabArt.GApp.Workers.LayerFinder();
 
         main() : void {
@@ -28,8 +30,8 @@ module GrabArt.GApp {
                            .addWidget(this.grid)
                            .addWidget(this.layers);
 
-            this.grid.activateCell(2, 2);
-            this.grid.selectCell(4, 4);
+            //this.grid.activateCell(2, 2);
+            //this.grid.selectCell(4, 4);
             this.mainWindow.enableDragging();
 
             //this.layers.addLayer({w: 10, h: 10});
@@ -53,7 +55,12 @@ module GrabArt.GApp {
 
         startButton_Click_GetCallback() : (sender : Object, args : any) => void {
             return (sender, args) => {
-                this.grid.setGridDimensions(200, 100).redraw();
+                var selectedLayer    = this.layerFinder.getCurrentLayer(),
+                    verticalCells    = Math.round(selectedLayer.w / 512),
+                    horizontalCells  = Math.round(selectedLayer.h / 512);
+
+                this.grid.setGridDimensions(verticalCells, horizontalCells).redraw();
+                GrabArt.Core.Process.create('grabber', 1, this.grabber.getRunner(selectedLayer.dom));
             };
         }
 
@@ -81,6 +88,12 @@ module GrabArt.GApp {
         layerFinder_LayerChanged_GetCallback() : (sender : Object, args : any) => void {
             return (sender, args) => {
                 this.layers.setSelectedLayer(args).redraw();
+            }
+        }
+
+        grabber_CellChanged_GetCallback() : (sender : Object, args : any) => void {
+            return (sender, args) => {
+                this.grid.selectCell(args.x, args.y).redraw();
             }
         }
 
@@ -113,6 +126,7 @@ module GrabArt.GApp {
             this.layers.Resize.addListener(this.layers_Resize_GetCallback());
             this.layerFinder.LayerFound.addListener(this.layerFinder_LayerFound_GetCallback());
             this.layerFinder.LayerChanged.addListener(this.layerFinder_LayerChanged_GetCallback());
+            this.grabber.CellChanged.addListener(this.grabber_CellChanged_GetCallback());
             return this;
         }
     }

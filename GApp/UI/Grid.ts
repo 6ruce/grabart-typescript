@@ -89,7 +89,7 @@ module GrabArt.GApp.UI {
             this.drawCell(x, y, this.activeColor);
         }
 
-        selectCell(x : number, y : number) : void {
+        selectCell(x : number, y : number) : Grid {
             if (x < 0 || x >= this.getGridDimensions().nw) throw "x parameter out of bounds";
             if (y < 0 || y >= this.getGridDimensions().nh) throw "y parameter out of bounds";
 
@@ -119,6 +119,7 @@ module GrabArt.GApp.UI {
             }
 
             this.prevSelected = {x: x, y: y};
+            return this;
         }
 
         private drawCell(x : number, y : number, color : string) : void {

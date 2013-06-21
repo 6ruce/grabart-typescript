@@ -9,7 +9,6 @@ module GrabArt.UI {
         pressedColor__  : string = 'darkblue';
         hoverColor__    : string = 'blue';
         previousColor__ : string = '';
-        
 
         constructor(name : string) {
             super(name);

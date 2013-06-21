@@ -24,19 +24,14 @@ module GrabArt.GApp.Workers {
                     , key    : string
                     , width  : number
                     , height : number
-                    , imageWidth  : number
-                    , imageHeight : number;
+                    , layerSizes = this.getLayerActualSizes(layer);
 
                 if (layer[0]) {
-                    imageWidth  = parseInt(layer.children().first().css('width'));
-                    imageHeight = parseInt(layer.children().first().css('height'));
-                    width  = Math.round((parseInt(layer.css('width'))  / imageWidth  + 0.49)) * 512;
-                    height = Math.round((parseInt(layer.css('height')) / imageHeight + 0.49)) * 512;
+                    width  = layerSizes.w;
+                    height = layerSizes.h
                     if (width == this.stableCandidate) {
                         key = width + 'x' + height;
                         if (! this.layers[key]) {
-                            console.log(key);
-                            console.log(this.layers);
                             this.layers[key] = layer;
                             this.layerFoundEv.fire(this, {w : width, h : height});
                         }
@@ -49,6 +44,28 @@ module GrabArt.GApp.Workers {
                     this.stableCandidate = width;
                 }
             }
+        }
+
+        getCurrentLayer() {
+            if (this.selectedLayer != '') {
+                var actualSizes = this.getLayerActualSizes(this.layers[this.selectedLayer]);
+                return {
+                    w   : actualSizes.w,
+                    h   : actualSizes.h,
+                    dom : this.layers[this.selectedLayer]
+                };
+            } else {
+                return null;
+            }
+        }
+
+        private getLayerActualSizes(layer : any) : {w: number; h: number;} {
+            var imageWidth  = parseInt(layer.children().first().css('width')),
+                imageHeight = parseInt(layer.children().first().css('height')),
+                width  = Math.round((parseInt(layer.css('width'))  / imageWidth  + 0.49)) * 512,
+                height = Math.round((parseInt(layer.css('height')) / imageHeight + 0.49)) * 512;
+
+            return {w: width, h: height};
         }
     }
 }
