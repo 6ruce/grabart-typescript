@@ -2,14 +2,21 @@
 
 module GrabArt.GApp.UI {
     export class Grid extends GrabArt.UI.CanvasWidget {
-        private separatorSize : number = 1;
-        private activeColor   : string = 'red';
-        private regularColor  : string = 'yellow';
-        private selectColor   : string = 'yellow';
-        private cellSizes     : {w: number; h: number;};
-        private prevSelected  : {x: number; y: number;} = null;
-        private minCellSize   : number = 4;
+
+        private activeColor        : string = 'red';
+        private regularColor       : string = 'white';
+        private selectColor        : string = 'yellow';
+        private disabledColor      : string = 'grey';
+
+        private separatorSize      : number = 1;
+        private cellSizes          : {w: number; h: number;};
+        private prevSelected       : {x: number; y: number;} = null;
+        private minCellSize        : number = 4;
+        private selectedCellsCount : number = 0;
         private cellsMap = [];
+
+        private cellSelectedFlag  = 1;
+        private cellDisabledFlag  = 2;
 
         private resizeEv  : GrabArt.Core.EntireEvent = new GrabArt.Core.EntireEvent();
 
@@ -64,15 +71,19 @@ module GrabArt.GApp.UI {
             }
 
             widthOffset = heightOffset = 0;
-            for (var i = 0; i < heightBlocks; i++) {
-                widthOffset = 0;
+            for (var i = 0; i < widthBlocks; i++) {
+                heightOffset = 0;
                 this.cellsMap[i] = this.cellsMap[i] || [];
-                for (var j = 0; j < widthBlocks; j++) {
-                    context.fillStyle = (this.cellsMap[i][j]) ? this.activeColor : this.regularColor;
+                for (var j = 0; j < heightBlocks; j++) {
+                    context.fillStyle = (this.cellsMap[i][j] == this.cellSelectedFlag)
+                                        ? this.activeColor
+                                        : ((this.cellsMap[i][j] == this.cellDisabledFlag)
+                                          ? this.disabledColor : this.regularColor);
+
                     context.fillRect(widthOffset, heightOffset, cellWidth, cellHeight);
-                    widthOffset += cellWidth + this.separatorSize;
+                    heightOffset += cellHeight + this.separatorSize;
                 }
-                heightOffset += cellHeight + this.separatorSize;
+                widthOffset += cellWidth + this.separatorSize;
             }
 
             if (this.prevSelected !== null) {
@@ -84,9 +95,16 @@ module GrabArt.GApp.UI {
             if (x < 0 || x >= this.getGridDimensions().nw) throw "x parameter out of bounds";
             if (y < 0 || y >= this.getGridDimensions().nh) throw "y parameter out of bounds";
 
-            this.cellsMap[x]    = this.cellsMap[x] || [];
-            this.cellsMap[x][y] = true;
-            this.drawCell(x, y, this.activeColor);
+            if (! this.cellsMap[x]
+                || ! this.cellsMap[x][y]
+                || (this.cellsMap[x][y]    != this.cellDisabledFlag
+                    || this.cellsMap[x][y] != this.cellSelectedFlag)
+            ) {
+                this.cellsMap[x]    = this.cellsMap[x] || [];
+                this.cellsMap[x][y] = this.cellSelectedFlag;
+                this.drawCell(x, y, this.activeColor);
+                this.selectedCellsCount++;
+            }
         }
 
         selectCell(x : number, y : number) : Grid {
@@ -122,6 +140,15 @@ module GrabArt.GApp.UI {
             return this;
         }
 
+        disableActiveCells() : Grid {
+            for (var w in this.cellsMap) {
+                for (var h in this.cellsMap[w]) {
+                    this.cellsMap[w][h] = this.cellDisabledFlag;
+                }
+            }
+            return this;
+        }
+
         private drawCell(x : number, y : number, color : string) : void {
             if (this.domElement__) {
                 var context      = this.domElement__[0].getContext('2d'),
@@ -149,6 +176,16 @@ module GrabArt.GApp.UI {
             if (color == '') throw "color is empty";
             this.activeColor = color;
             return this;
+        }
+
+        setDisabledColor(color : string) : Grid {
+            if (color == '') throw "color is empty";
+            this.disabledColor = color;
+            return this;
+        }
+
+        getSelectedCellsCount() : number {
+            return this.selectedCellsCount;
         }
 
         setGridDimensions(nw : number, nh : number) : Grid {

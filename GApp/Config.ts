@@ -12,9 +12,10 @@ module GrabArt.GApp {
                 , backColor    : '#828575'
             }
             , grid             : {
-                  regularColor   : '#ACAAB0'
+                  regularColor   : 'white'
                 , activeColor    : '#A2000C'
                 , backColor      : '#484749'
+                , disabledColor  : '#ACAAB0'
             }
         };
     }

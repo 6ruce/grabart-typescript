@@ -3,7 +3,7 @@
 module GrabArt.UI {
     declare var $;
     export class ProgressBar extends CanvasWidget {
-        private progress  : number = 100;
+        private progress  : number = 0;
         private barColor  : string = 'red';
         private fontColor : string = 'white';
 
@@ -23,10 +23,12 @@ module GrabArt.UI {
             this.refreshProgress(this.domElement__);
         }
 
-        setProgress(progress : number) : void {
+        setProgress(progress : number) : ProgressBar {
             if      (progress < 0  ) this.progress = 0;
             else if (progress > 100) this.progress = 100;
             else                     this.progress = progress;
+
+            return this;
         }
 
         increase(amount : number) : ProgressBar {
@@ -39,7 +41,7 @@ module GrabArt.UI {
             if (! canvasElement[0].getContext)
                 throw 'Cant get canvas context';
 
-            var textProgress = this.progress + '%',
+            var textProgress = this.progress.toFixed(2) + '%',
                 context      = canvasElement[0].getContext('2d');
 
             context.fillStyle = this.getBackgroundColor();

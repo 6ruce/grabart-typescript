@@ -703,7 +703,6 @@ var GrabArt;
                                 _super.call(this, 'layers');
                     this.layers = {
                     };
-                    this.layersWidths = [];
                     this.selectedLayer = null;
                     this.initialHeight = 0;
                     this.initialHOffset = 2;
@@ -913,6 +912,7 @@ var GrabArt;
                         x: x,
                         y: y
                     };
+                    return this;
                 };
                 Grid.prototype.drawCell = function (x, y, color) {
                     if(this.domElement__) {
@@ -973,17 +973,13 @@ var GrabArt;
                     return function () {
                         var layer = $('.m2-tileLayer').filter(function (_) {
                             return $(this).children().length != 0;
-                        }).last(), key, width, height, imageWidth, imageHeight;
+                        }).last(), key, width, height, layerSizes = _this.getLayerActualSizes(layer);
                         if(layer[0]) {
-                            imageWidth = parseInt(layer.children().first().css('width'));
-                            imageHeight = parseInt(layer.children().first().css('height'));
-                            width = Math.round((parseInt(layer.css('width')) / imageWidth + 0.49)) * 512;
-                            height = Math.round((parseInt(layer.css('height')) / imageHeight + 0.49)) * 512;
+                            width = layerSizes.w;
+                            height = layerSizes.h;
                             if(width == _this.stableCandidate) {
                                 key = width + 'x' + height;
                                 if(!_this.layers[key]) {
-                                    console.log(key);
-                                    console.log(_this.layers);
                                     _this.layers[key] = layer;
                                     _this.layerFoundEv.fire(_this, {
                                         w: width,
@@ -1002,9 +998,60 @@ var GrabArt;
                         }
                     };
                 };
+                LayerFinder.prototype.getCurrentLayer = function () {
+                    return this.selectedLayer != '' ? this.getLayerActualSizes(this.layers[this.selectedLayer]) : null;
+                };
+                LayerFinder.prototype.getLayerActualSizes = function (layer) {
+                    var imageWidth = parseInt(layer.children().first().css('width')), imageHeight = parseInt(layer.children().first().css('height')), width = Math.round((parseInt(layer.css('width')) / imageWidth + 0.49)) * 512, height = Math.round((parseInt(layer.css('height')) / imageHeight + 0.49)) * 512;
+                    return {
+                        w: width,
+                        h: height
+                    };
+                };
                 return LayerFinder;
             })();
             Workers.LayerFinder = LayerFinder;            
+        })(GApp.Workers || (GApp.Workers = {}));
+        var Workers = GApp.Workers;
+    })(GrabArt.GApp || (GrabArt.GApp = {}));
+    var GApp = GrabArt.GApp;
+})(GrabArt || (GrabArt = {}));
+var GrabArt;
+(function (GrabArt) {
+    (function (GApp) {
+        (function (Workers) {
+            var Grabber = (function () {
+                function Grabber() {
+                    this.oldImages = {
+                    };
+                    this.newImages = {
+                    };
+                    this.cellChangedEv = new GrabArt.Core.EntireEvent();
+                    this.CellChanged = this.cellChangedEv;
+                }
+                Grabber.prototype.getRunner = function (layer) {
+                    var _this = this;
+                    var _this = this;
+                    return function () {
+                        console.log(layer.children());
+                        layer.children().each(function (_1, _2) {
+                            var currentImage = $(this), x = Math.round(currentImage.css('left') / currentImage.css('width')), y = Math.round(currentImage.css('top') / currentImage.css('height'));
+                            if(!_this.oldImages[x + 'x' + y]) {
+                                _this.cellChangedEv.fire(_this, {
+                                    x: x,
+                                    y: y
+                                });
+                            }
+                            _this.newImages[x + 'x' + y] = x + 'x' + y;
+                        });
+                        _this.oldImages = _this.newImages;
+                        _this.newImages = {
+                        };
+                    };
+                };
+                return Grabber;
+            })();
+            Workers.Grabber = Grabber;            
         })(GApp.Workers || (GApp.Workers = {}));
         var Workers = GApp.Workers;
     })(GrabArt.GApp || (GrabArt.GApp = {}));
@@ -1110,12 +1157,11 @@ var GrabArt;
                 this.progressBar = new GrabArt.GApp.UI.GrabProgress();
                 this.layers = new GrabArt.GApp.UI.Layers();
                 this.grid = new GrabArt.GApp.UI.Grid(20, 10);
+                this.grabber = new GrabArt.GApp.Workers.Grabber();
                 this.layerFinder = new GrabArt.GApp.Workers.LayerFinder();
             }
             Application.prototype.main = function () {
                 this.mainWindow.addWidget(this.startButton).addWidget(this.copyButton).addWidget(this.progressBar).addWidget(this.grid).addWidget(this.layers);
-                this.grid.activateCell(2, 2);
-                this.grid.selectCell(4, 4);
                 this.mainWindow.enableDragging();
                 GrabArt.Core.Process.create('layerFinder', 1, this.layerFinder.getRunner());
                 this.applyColorScheme().wireEvents();
@@ -1124,7 +1170,6 @@ var GrabArt;
             Application.prototype.grid_Resize_GetCallback = function () {
                 var _this = this;
                 return function (sender, args) {
-                    console.log('dw:' + args.dw + ' dh:' + args.dh);
                     _this.mainWindow.resize(args.dw, args.dh);
                     _this.copyButton.resize(args.dw, 0);
                     _this.progressBar.resize(args.dw, 0);
@@ -1135,7 +1180,10 @@ var GrabArt;
             Application.prototype.startButton_Click_GetCallback = function () {
                 var _this = this;
                 return function (sender, args) {
-                    _this.grid.setGridDimensions(200, 100).redraw();
+                    var selectedLayer = _this.layerFinder.getCurrentLayer(), verticalCells = Math.round(selectedLayer.w / 512), horizontalCells = Math.round(selectedLayer.h / 512);
+                    _this.grid.setGridDimensions(verticalCells, horizontalCells).redraw();
+                    GrabArt.Core.Process.create('grabber', 1, _this.grabber.getRunner(selectedLayer));
+                    console.log('created');
                 };
             };
             Application.prototype.copyButton_Click_GetCallback = function () {
@@ -1165,6 +1213,13 @@ var GrabArt;
                     _this.layers.setSelectedLayer(args).redraw();
                 };
             };
+            Application.prototype.grabber_CellChanged_GetCallback = function () {
+                var _this = this;
+                return function (sender, args) {
+                    console.log(args);
+                    _this.grid.selectCell(args.x, args.y).redraw();
+                };
+            };
             Application.prototype.applyColorScheme = function () {
                 var colorScheme = GrabArt.GApp.Config.colorScheme;
                 this.mainWindow.setBackgroundColor(colorScheme.mainWindowColor);
@@ -1181,6 +1236,7 @@ var GrabArt;
                 this.layers.Resize.addListener(this.layers_Resize_GetCallback());
                 this.layerFinder.LayerFound.addListener(this.layerFinder_LayerFound_GetCallback());
                 this.layerFinder.LayerChanged.addListener(this.layerFinder_LayerChanged_GetCallback());
+                this.grabber.CellChanged.addListener(this.graber_CellChanged_GetCallback());
                 return this;
             };
             return Application;

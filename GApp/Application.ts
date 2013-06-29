@@ -12,6 +12,7 @@
 /// <reference  path="../Core/Process.ts"               />
 
 module GrabArt.GApp {
+    declare var $;
     export class Application extends GrabArt.UI.Services.Application {
         private mainWindow  = new GrabArt.GApp.UI.MainWidget();
         private startButton = new GrabArt.GApp.UI.StartButton();
@@ -30,13 +31,8 @@ module GrabArt.GApp {
                            .addWidget(this.grid)
                            .addWidget(this.layers);
 
-            //this.grid.activateCell(2, 2);
-            //this.grid.selectCell(4, 4);
             this.mainWindow.enableDragging();
 
-            //this.layers.addLayer({w: 10, h: 10});
-            //this.layers.addLayer({w: 12, h: 10});
-            //this.layers.addLayer({w: 13, h: 10});
             GrabArt.Core.Process.create('layerFinder', 1, this.layerFinder.getRunner());
 
             this.applyColorScheme().wireEvents();
@@ -66,7 +62,16 @@ module GrabArt.GApp {
 
         copyButton_Click_GetCallback() : (sender : Object, args : any) => void {
             return (sender, args) => {
-                this.progressBar.increase(10).redraw();
+                var copyWindow = window.open('', 'Copy'),
+                    textArea   = $('<textarea>');
+
+                this.grabber.postCollectedString(textArea);
+                $(copyWindow.document.body).append('Copy: Ctrl+A -> Ctr+C');
+                $(copyWindow.document.body).append($('<br>'));
+                $(copyWindow.document.body).append(textArea);
+
+                this.grabber.disableActiveCells();
+                this.grid.disableActiveCells().redraw();
             };
         }
 
@@ -97,6 +102,16 @@ module GrabArt.GApp {
             }
         }
 
+        grabber_ImageFound_GetCallback() : (sender : Object, args : any) => void {
+            return (sender, args) => {
+                this.grid.activateCell(args.x, args.y);
+                this.progressBar.setProgress(
+                    this.grid.getSelectedCellsCount() /
+                        (this.grid.getGridDimensions().nh * this.grid.getGridDimensions().nw) * 100
+                ).redraw();
+            }
+        }
+
         private applyColorScheme() : Application {
             var colorScheme = GrabArt.GApp.Config.colorScheme;
             this.mainWindow.setBackgroundColor(colorScheme.mainWindowColor);
@@ -114,6 +129,7 @@ module GrabArt.GApp {
 
             this.grid.setActiveColor(colorScheme.grid.activeColor)
                      .setRegularColor(colorScheme.grid.regularColor)
+                     .setDisabledColor(colorScheme.grid.disabledColor)
                      .setBackgroundColor(colorScheme.mainWindowColor);
 
             return this;
@@ -127,6 +143,7 @@ module GrabArt.GApp {
             this.layerFinder.LayerFound.addListener(this.layerFinder_LayerFound_GetCallback());
             this.layerFinder.LayerChanged.addListener(this.layerFinder_LayerChanged_GetCallback());
             this.grabber.CellChanged.addListener(this.grabber_CellChanged_GetCallback());
+            this.grabber.ImageFound.addListener(this.grabber_ImageFound_GetCallback());
             return this;
         }
     }
